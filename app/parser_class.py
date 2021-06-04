@@ -3,8 +3,27 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, regexp_tokenize
 import re
 import spacy
+from sqlalchemy.orm import Session
 
+from sqlalchemy import insert, select, create_engine, MetaData, Table, Column, Integer, String
 from app.parse import DATA_REGEX, TIME_REGEX
+
+engine = create_engine('sqlite:///events.db', echo = True)
+# holds a collection of Table objects
+meta = MetaData()
+
+# Create a database
+Events_table = Table(
+   'Events', meta,
+   Column('id', Integer, primary_key = True),
+   Column('date', String),
+   Column('start_time', String),
+   Column('end_time', String),
+   Column('author', String),
+   Column('event_name', String),
+   Column('employee', String)
+)
+meta.create_all(engine)
 
 nltk.download("stopwords")
 STOP_WORDS = set(stopwords.words("english"))
@@ -32,12 +51,11 @@ class Event:
                                                           self.employee,
                                                           self.author,
                                                           self.event_name))
+        # conn = engine.connect()
 
     def __call__(self):
         """Generate an Event"""
 
-    def push_to_database(self):
-        pass
 
 class Parser:
     '''
@@ -49,16 +67,46 @@ class Parser:
             text_mail = email_text.read()
             tokens_dirty = nltk.word_tokenize(text_mail)
         self.tokens = [word for word in tokens_dirty if not word in STOP_WORDS]
-        self.date = self.data_parser()
-        self.times = self.time_parser()
+        self.date = self.data_parser() or "date"
         self.nlp_pipe = self.nlp_pipe()
         self.events_list = self.create_events_list()
-        self.employee = self.find_employee()
+        self.employee = self.find_employee() or "employee"
+        self.author = 'author'
+
+
+    def insert_into(self):
+        with engine.connect() as conn:
+            for event in self.events_list:
+                evn = insert(Events_table).values(date = self.date,
+                                             start_time = str(event[0]),
+                                             end_time = str(event[1]),
+                                             author = self.author,
+                                             event_name = str(event[2]),
+                                             employee = self.employee
+                                             )
+                conn.execute(evn)
+            #conn.commit()
+
+    def select_query(self, query: str = None):
+        sql_query = select(Events_table)
+        with engine.connect() as conn:
+            for row in conn.execute(sql_query):
+                print(row)
+
+
+    # def run(self, query: str):
+    #     conn = engine.connect()
+    #     q = Events_table.select()
+    #     result = conn.execute(q)
+    #     if query.upper().startswith("SELECT"):
+    #         return result.fetchall()
+
 
     def create_events_list(self):
         self.events_list = []
         for ind, word in enumerate(self.nlp_pipe):
             # cache words sequence 'NUM' 'NUM' and 'ADJ' or 'NOUN'
+            # ('NUM', 'NUM', 'ADJ), ('NUM', 'NUM', NOUN') in - way to solve ('NUM', NOUN', 'NUM')
             if ind <= len(self.nlp_pipe)-3:
                 if self.nlp_pipe[ind][1] == 'NUM' and \
                    self.nlp_pipe[ind+1][1] == 'NUM' and \
@@ -81,15 +129,17 @@ class Parser:
             # after 4 token break, name should be in first 4 words
             if ind > 3:
                 break
-        return self.employee
+        return str(self.employee)
 
 
-    def create_events(self):
-        for event in self.events_list:
-            single_event = Event(date = self.date, start_time = event[0], end_time = event[1],
-                                 employee = self.employee, event_name = event[2])
-            single_event.push_to_database()
-        return True
+    # def create_events_obj(self):
+    #     events_object_list = []
+    #     for event in self.events_list:
+    #         single_event = Event(date = self.date, start_time = event[0], end_time = event[1],
+    #                              employee = self.employee, event_name = event[2])
+    #         events_object_list.append(single_event)
+    #         #single_event.push_to_database()
+    #     return events_object_list
 
     def nlp_pipe(self):
         '''
@@ -113,7 +163,7 @@ class Parser:
         for token in self.tokens:
             if re.match(DATA_REGEX, token):
                 data_result.append(token)
-        return data_result
+        return str(data_result)
 
 
     def time_parser(self):
