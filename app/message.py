@@ -16,15 +16,15 @@ class Message:
         tokens_dirty = nltk.word_tokenize(text)
         self.tokens = [word for word in tokens_dirty if not word in STOP_WORDS]
         self.user = user
-        self.timelog = {}
+        self.timelogs = []
 
-    def parse_text(self):
+    def to_timelogs_list(self):
         nlp_pipe = self.nlp_pipe()
         num = 0
         for ind, word in enumerate(nlp_pipe):
             # cache words sequence 'NUM' 'NUM' and 'ADJ' or 'NOUN'
             # ('NUM', 'NUM', 'ADJ), ('NUM', 'NUM', NOUN') in - way to solve ('NUM', NOUN', 'NUM')
-            event = {}
+            timelog = {}
             if ind <= len(nlp_pipe)-3:
                 if nlp_pipe[ind][1] == 'NUM' and \
                    nlp_pipe[ind+1][1] == 'NUM' and \
@@ -34,15 +34,16 @@ class Message:
                    nlp_pipe[ind+2][1] == 'ADJ':
 
                     num += 1
-                    event_name = f'event_{num}'
-                    event['start_time'] = nlp_pipe[ind][0]
-                    event['end_time'] = nlp_pipe[ind+1][0]
-                    event['project_name'] = nlp_pipe[ind+2][0]
-                    event['employee'] = self.find_employee() or 'Someone'
+                    timelog_name = f'timelog_{num}'
+                    timelog['timelog_name'] = f'timelog_{num}'
+                    timelog['start_time'] = str(nlp_pipe[ind][0])
+                    timelog['end_time'] = str(nlp_pipe[ind+1][0])
+                    timelog['project_name'] = str(nlp_pipe[ind+2][0])
+                    timelog['employee'] = self.find_employee() or 'Someone'
+                    timelog['user'] = self.user
+                    self.timelogs.append(timelog)
 
-                    self.timelog[event_name] = event
-
-        return self.timelog
+        return self.timelogs
 
 
     def find_employee(self):
@@ -56,11 +57,6 @@ class Message:
             if ind > 3:
                 break
         return str(self.employee)
-
-
-    def to_dict(self):
-        self.timelog['user'] = self.user
-        return self.timelog
 
 
     def nlp_pipe(self):
