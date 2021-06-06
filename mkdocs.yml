@@ -1,0 +1,24 @@
+site_name: messages_tracker Docs
+nav:
+  - Home: home.md
+  - Howtos:
+      - "Config File": howtos/config_file.md
+  - Tutorials:
+      - Tutorials: tutorials/tutorial.md
+  - Explanations:
+      - "SQL Sources": explanation/sql_sources.md
+      - "API Sources": explanation/api_sources.md
+theme:
+  name: "material"
+  features:
+    - navigation.tabs
+plugins:
+  - search
+  - mkdocstrings:
+      watch:
+        - messages_tracker
+      handlers:
+        python:
+          rendering:
+            show_root_heading: yes
+dev_addr: "0.0.0.0:8000"
