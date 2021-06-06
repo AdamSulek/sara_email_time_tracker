@@ -9,16 +9,27 @@ nltk.download("stopwords")
 STOP_WORDS = set(stopwords.words("english"))
 
 class Message:
-    '''
-        In the future it will be in prefect
-    '''
+    """
+    A class implementing Natural language processing
+    to parse timelog information from messages.
+
+    Parameters
+    ----------
+    text: str, optional
+        The parameter to fetch information from text message.
+        by default None
+    user: str, optional
+        The parameter to store author of message.
+        by default None
+    """
     def __init__(self, text: str = None, user: str = None):
         tokens_dirty = nltk.word_tokenize(text)
         self.tokens = [word for word in tokens_dirty if not word in STOP_WORDS]
         self.user = user
         self.timelogs = []
 
-    def to_timelogs_list(self):
+
+    def to_records(self):
         nlp_pipe = self.nlp_pipe()
         num = 0
         for ind, word in enumerate(nlp_pipe):

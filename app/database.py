@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session, scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import insert, select, create_engine, MetaData, Table, Column, Integer, String
 from .message import Message
-#from .table import events_table
 from typing import Any, Dict, List
 
 import time
@@ -24,19 +23,29 @@ class TimeLogs(Base):
 
 
 class Database:
+    """
+    This class represents Database with initialize db connection,
+    insert_bulk and select_query methods.
 
+    Parameters
+    ----------
+    timelogs: List[str], optional
+        The timelogs list information from text message.
+        by default None
+    database_name: str, optional
+        by default sqlalchemy.db will be created in root directory.
+    """
     def __init__(self, timelogs: List[str] = None, database_name: str = 'sqlite:///sqlalchemy.db'):
         self.timelogs = timelogs
         self.database_name = database_name
         engine = create_engine(self.database_name, echo=False)
-        DBSession.remove()
+        #DBSession.remove()
         DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
-        Base.metadata.drop_all(engine)
+        #Base.metadata.drop_all(engine)
         Base.metadata.create_all(engine)
 
 
     def insert_bulk(self):
-        #self.init_sqlalchemy()
         t0 = time.time()
         DBSession.bulk_insert_mappings(
             TimeLogs,
