@@ -72,7 +72,7 @@ class Message:
 
     def nlp_pipe(self):
         '''
-            nlp.pipe to process a (potentially very large) iterable of texts
+            nlp.pipe function process a (potentially very large) iterable of texts
             as a stream
 
             nlp.pipe

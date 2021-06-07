@@ -4,8 +4,6 @@ from sqlalchemy import insert, select, create_engine, MetaData, Table, Column, I
 from .message import Message
 from typing import Any, Dict, List
 
-import time
-
 Base = declarative_base()
 DBSession = scoped_session(sessionmaker())
 engine = None
@@ -43,10 +41,25 @@ class Database:
         DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
         #Base.metadata.drop_all(engine)
         Base.metadata.create_all(engine)
+        self.user = self.timelogs[0]['user']
+        self.start_time = self.timelogs[0]['start_time']
+        #print("self.timelogs.project_name: {}".format(self.timelogs[0]['project_name']))
 
+    def insert_into(self):
+        if not self.check_duplicates():
+            DBSession.add(TimeLogs(timelog_name=self.timelogs[0]['timelog_name'],
+                                   start_time=self.timelogs[0]['start_time'],
+                                   end_time=self.timelogs[0]['end_time'],
+                                   project_name=self.timelogs[0]['project_name'],
+                                   employee=self.timelogs[0]['employee'],
+                                   user=self.timelogs[0]['user']
+                                   ))
+            DBSession.commit()
+        #     print("THIS IS NOT A DUPLICATE!!!!")
+        # else:
+        #     print("AWARE - THIS IS A DUPLICATE!!!!")
 
     def insert_bulk(self):
-        t0 = time.time()
         DBSession.bulk_insert_mappings(
             TimeLogs,
             [
@@ -54,20 +67,39 @@ class Database:
             ]
         )
         DBSession.commit()
-        print(
-            "SQLAlchemy ORM bulk_save_objects(): Total time for " +
-            " records " + str(time.time() - t0) + " secs" + '\n')
+
+        return True
 
     def select_query(self):
+        table_record = []
         sql_select_query = DBSession.query(TimeLogs).all()
         for row in sql_select_query:
-            print("event ID: {},\nevent_name: {},\n\
-                   start_time: {},\nend_time: {},\n\
-                   project_name: {},\nemployee: {}\n".format(row.id,
-                                                              row.timelog_name,
-                                                              row.start_time,
-                                                              row.end_time,
-                                                              row.project_name,
-                                                              row.employee))
+            # print("event ID: {},\nevent_name: {},\n\
+            #        start_time: {},\nend_time: {},\n\
+            #        project_name: {},\nemployee: {}\n".format(row.id,
+            #                                                  row.timelog_name,
+            #                                                  row.start_time,
+            #                                                  row.end_time,
+            #                                                  row.project_name,
+            #                                                  row.employee))
+            table_record.append((row.id,
+                                 row.timelog_name,
+                                 row.start_time,
+                                 row.end_time,
+                                 row.project_name,
+                                 row.employee,
+                                 row.user))
 
-        #return sql_select_query
+        return table_record
+
+
+    def check_duplicates(self):
+        filter = DBSession.query(TimeLogs).filter_by(user=self.user, start_time=self.start_time).first()
+        # print("user: {}\n start_time: {}\n filter: {}".format(self.user,
+        #                                                       self.start_time,
+        #                                                       filter))
+        if filter:
+            #print("DUPLICATE")
+            return True
+        p#rint("NOT DUPLICATE")
+        return False

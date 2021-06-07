@@ -20,17 +20,19 @@ class ChannelHistory(Task):
         self.records = []
 
 
-    def channel_to_records(self):
+    def to_records(self):
         for message in self.messages:
             msg = Message(text=message['text'], user=message['user'])
             rec = msg.to_records()
-            if rec != []:
+            if rec != [] and db.check_duplicates:
                 self.records.append(rec)
         return self.records
 
-    def channel_to_database(self):
+    def to_database(self):
+        if self.records == []:
+            self.to_records()
         for record in self.records:
-            msg_to_db = Database(record)
-            msg_to_db.insert_bulk()
+            db = Database(record)
+            db.insert()
 
         return True
