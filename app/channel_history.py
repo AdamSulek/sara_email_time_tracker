@@ -1,10 +1,12 @@
+from prefect import Task
 from typing import Any, Dict
 from .message import Message
 from .database import Database
 
 
-class ChannelHistory:
+class ChannelHistory(Task):
     """
+    Task???
     A class parsing timelog information from messages history.
 
     Parameters
