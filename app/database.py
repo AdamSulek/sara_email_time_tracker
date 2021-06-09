@@ -43,7 +43,7 @@ class Database:
         Base.metadata.create_all(engine)
         self.user = self.timelogs[0]['user']
         self.start_time = self.timelogs[0]['start_time']
-        #print("self.timelogs.project_name: {}".format(self.timelogs[0]['project_name']))
+        print("class Database: __init__\nself.timelogs.project_name: {}".format(self.timelogs[0]['project_name']))
 
     def insert_into(self):
         if not self.check_duplicates():
@@ -55,9 +55,9 @@ class Database:
                                    user=self.timelogs[0]['user']
                                    ))
             DBSession.commit()
-        #     print("THIS IS NOT A DUPLICATE!!!!")
-        # else:
-        #     print("AWARE - THIS IS A DUPLICATE!!!!")
+            print("class Database - method: insert_into\nTHIS IS NOT A DUPLICATE!!!!")
+        else:
+            print("class Database - method: insert_into\nAWARE - THIS IS A DUPLICATE!!!!")
 
     def insert_bulk(self):
         DBSession.bulk_insert_mappings(
@@ -95,11 +95,11 @@ class Database:
 
     def check_duplicates(self):
         filter = DBSession.query(TimeLogs).filter_by(user=self.user, start_time=self.start_time).first()
-        # print("user: {}\n start_time: {}\n filter: {}".format(self.user,
-        #                                                       self.start_time,
-        #                                                       filter))
+        print("class Database - method: check_duplicates\nuser: {}\n start_time: {}\n filter: {}".format(self.user,
+                                                              self.start_time,
+                                                              filter))
         if filter:
-            #print("DUPLICATE")
+            print("DUPLICATE")
             return True
-        #print("NOT DUPLICATE")
+        print("NOT DUPLICATE")
         return False

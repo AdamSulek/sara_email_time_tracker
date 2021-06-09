@@ -20,20 +20,22 @@ class ChannelHistory(Task):
         super().__init__(name="ChannelHistory", *args, **kwargs)
         self.messages = messages
         self.records = []
-        self.message = self.messages[0]['text']
-        self.user = self.messages[0]['user']
+        #self.message = self.messages[0]['text']
+        #self.user = self.messages[0]['user']
 
     def run(self):
-        msg = Message(text=self.message, user=self.user)
-        record = msg.to_records()
-        logger = prefect.context.get("logger")
-        if record:
-            logger.info(f"New record: {record}")
-        else:
-            logger.info(f"Ther is no record")
-        db = Database(timelogs=record)
-        db.insert_into()
 
+        for message in self.messages:
+            msg = Message(text=message['text'], user=message['user'])
+            record = msg.to_records()
+            logger = prefect.context.get("logger")
+            if record:
+                db = Database(timelogs=record)
+                db.insert_into()
+                logger.info(f"New record: {record}")
+            else:
+                logger.info(f"There is no record")
+            
         return True
 
     # def to_records(self):
