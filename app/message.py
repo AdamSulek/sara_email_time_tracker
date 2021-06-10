@@ -22,10 +22,11 @@ class Message:
         The parameter to store author of message.
         by default None
     """
-    def __init__(self, text: str = None, user: str = None):
+    def __init__(self, text: str = None, user: str = None, ts: float = None):
         tokens_dirty = nltk.word_tokenize(text)
         self.tokens = [word for word in tokens_dirty if not word in STOP_WORDS]
         self.user = user
+        self.ts = ts
         self.timelogs = []
 
 
@@ -52,6 +53,7 @@ class Message:
                     timelog['project_name'] = str(nlp_pipe[ind+2][0])
                     timelog['employee'] = self.find_employee() or 'Someone'
                     timelog['user'] = self.user
+                    timelog['ts'] = self.ts
                     self.timelogs.append(timelog)
 
         return self.timelogs
