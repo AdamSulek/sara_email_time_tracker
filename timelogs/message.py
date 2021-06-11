@@ -3,7 +3,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, regexp_tokenize
 import re
 import spacy
-from app.parse import DATA_REGEX, TIME_REGEX
+from .parse import DATA_REGEX, TIME_REGEX
 
 nltk.download("stopwords")
 STOP_WORDS = set(stopwords.words("english"))
@@ -25,6 +25,7 @@ class Message:
     def __init__(self, text: str = None, user: str = None, ts: float = None):
         tokens_dirty = nltk.word_tokenize(text)
         self.tokens = [word for word in tokens_dirty if not word in STOP_WORDS]
+        self.tokens = tokens_dirty
         self.user = user
         self.ts = ts
         self.timelogs = []

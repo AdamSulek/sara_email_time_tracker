@@ -3,8 +3,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, regexp_tokenize
 import re
 
-nltk.download("stopwords")
-STOP_WORDS = set(stopwords.words("english"))
+#nltk.download("stopwords")
+#STOP_WORDS = set(stopwords.words("english"))
 # dd/mm/yyyy, dd-mm-yyyy, dd.mm.yyyy, dd/Month/yyyy, dd Month yyyy,
 # dd/MONTH/yyyy or dd MONTH yyyy format
 DATA_REGEX = re.compile('(^(?:(?:(?:31(?:(?:([-.\/])'

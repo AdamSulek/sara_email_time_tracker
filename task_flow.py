@@ -1,23 +1,25 @@
 from prefect import task, Task, Flow
 from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 import logging
 import prefect
-from .database import TimeStamps, Database
-from .message import Message
+from timelogs.database import TimeStamps, Database
+from timelogs.message import Message
 from typing import Any, Dict, List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import json
 
 engine = create_engine('sqlite:///sqlalchemy.db', echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-TEST = [{'timelog_name': 'timelog_2',
-         'start_time': '9:49',
-         'end_time': '12:00',
-         'project_name': 'banana',
-         'employee': 'book',
-         'user': 'StefanBatory',
+TEST = [{'timelog_name': 'test',
+         'start_time': '0:00',
+         'end_time': '10:00',
+         'project_name': 'test',
+         'employee': 'test',
+         'user': 'user',
          'ts': '1622909735.001234'}]
 
 @task
@@ -28,7 +30,10 @@ def get_latest_timestamps():
 
 @task
 def retrive_messages(ts_from_db: float=1522909733.001234):
-    client = WebClient(token="xoxb-2055296280309-2146683809428-EUxKty9ne2jvWtwlSFP2XGy7")
+    with open('/home/token.json') as json_file:
+        token_dict = json.load(json_file)
+    token = token_dict['SLACK_TOKEN']
+    client = WebClient(token=token)
     logger = prefect.context.get("logger")
     channel_name = "learning"
     conversation_id = None
@@ -82,5 +87,5 @@ with Flow('Slack messages') as flow:
     timelogs = parse_messages(messages)
     add_to_database = insert_into_db(timelogs)
 
-def flow_run():
-    flow.run()
+
+flow.run()
