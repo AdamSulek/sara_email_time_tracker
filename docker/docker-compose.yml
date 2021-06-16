@@ -1,13 +1,15 @@
 version: '3.7'
 services:
   python:
+    container_name: task_flow
     image: python/python:3.9-buster
     volumes:
       - ../:/home
-  metabase-secrets:
+  metabase:
     image: metabase/metabase:latest
-    container_name: metabase-secrets
-    hostname: metabase-secrets
+    container_name: metabase
+    restart: always
+    hostname: metabase
     volumes:
     - /dev/urandom:/dev/random:ro
     ports:
@@ -16,34 +18,65 @@ services:
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: metabase
       MB_DB_PORT: 5432
-      MB_DB_USER: /run/secrets/db_user
-      MB_DB_PASS: /run/secrets/db_password
-      MB_DB_HOST: postgres-secrets
-    networks:
-      - metanet1-secrets
+      MB_DB_USER: postgres
+      MB_DB_PASS: postgres
+      MB_DB_HOST: database
+    # networks:
+    #   - metanet
     depends_on:
-      - postgres-secrets
+      - database
     secrets:
-      - db_password
       - db_user
-  postgres-secrets:
+      - db_password
+  database:
     image: postgres:latest
-    container_name: postgres-secrets
-    hostname: postgres-secrets
+    container_name: database
+    restart: always
+    hostname: database
     environment:
-      POSTGRES_USER: /run/secrets/db_user
+      POSTGRES_USER: postgres
       POSTGRES_DB: metabase
-      POSTGRES_PASSWORD: /run/secrets/db_password
-    networks:
-      - metanet1-secrets
+      POSTGRES_PASSWORD: postgres
+      #POSTGRES_PASSWORD: /run/secrets/db_password
+      #PGDATA: /var/lib/postgresql/data
+    # networks:
+    #   - metanet
+    ports:
+      - 3030:5432
+    expose:
+      - 5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      #- ~/docker/volumes/postgres:/var/lib/postgresql/data
     secrets:
-      - db_password
       - db_user
-networks:
-  metanet1-secrets:
-    driver: bridge
+      - db_password
+  database_admin:
+    image: dpage/pgadmin4
+    container_name: database_admin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      #PGADMIN_LISTEN_PORT: 80
+    # networks:
+    #   - metanet
+    ports:
+      - 5050:80
+    # volumes:
+    #   - ~/docker/volumes/pgadmin-data:/var/lib/pgadmin
+    # links:
+    #   - "database:pgsql-server"
+
+# networks:
+#   metanet:
+#     driver: bridge
+
 secrets:
-   db_password:
-     file: ./db_password.txt
-   db_user:
-     file: ./db_user.txt
+  db_user:
+    file: ./db_user.txt
+  db_password:
+    file: ./db_password.txt
+volumes:
+  db-data:
+#   pgadmin-data:
