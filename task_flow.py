@@ -30,7 +30,8 @@ def get_latest_timestamps():
 
 @task
 def retrive_messages(ts_from_db: float=1522909733.001234):
-    with open('/home/token.json') as json_file:
+    with open('home/token.json') as json_file:
+    # with open('./token.json') as json_file:
         token_dict = json.load(json_file)
     token = token_dict['SLACK_TOKEN']
     client = WebClient(token=token)
