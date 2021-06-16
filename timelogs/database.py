@@ -40,10 +40,15 @@ class Database:
     database_name: str, optional
         by default sqlalchemy.db will be created in root directory.
     """
-    def __init__(self, messages: List[str] = None, database_name: str = 'sqlite:///sqlalchemy.db'):
+    def __init__(self, messages: List[str] = None, database_name: str = 'metabase'):
         self.messages = messages
         self.database_name = database_name
-        engine = create_engine(self.database_name, echo=False)
+        POSTGRES_URL = 'postgresql://{}:{}@{}:{}/{}'.format('postgres',        # user
+                                                            'postgres',        # password
+                                                            'database',        # host name
+                                                            '5432',            # port
+                                                            self.database_name # database)
+        engine = create_engine(POSTGRES_URL)
         DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
         Base.metadata.create_all(engine)
         # adding of timestamps of every message - even for message without timelog event

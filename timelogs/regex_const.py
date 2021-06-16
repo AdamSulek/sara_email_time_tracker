@@ -1,10 +1,5 @@
-import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, regexp_tokenize
 import re
 
-#nltk.download("stopwords")
-#STOP_WORDS = set(stopwords.words("english"))
 # dd/mm/yyyy, dd-mm-yyyy, dd.mm.yyyy, dd/Month/yyyy, dd Month yyyy,
 # dd/MONTH/yyyy or dd MONTH yyyy format
 DATA_REGEX = re.compile('(^(?:(?:(?:31(?:(?:([-.\/])'
@@ -25,31 +20,3 @@ TIME_REGEX = re.compile( '(^(0?[1-9]|1[0-2]):[0-5][0-9]$|)'                 #HH:
                          '(^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$)|'     #HH:MM 24-hour format, optional leading 0
                          '(?:[01]\d|2[0-3]):(?:[0-5]\d):(?:[0-5]\d)'      #HH:MM:SS 24-hour format with leading 0
                         )
-
-def parser_stop_words(file_path: str):
-    processed_email = []
-    with open(file_path, 'r') as email_text:
-        for word in email_text:
-            if word.casefold() not in STOP_WORDS:
-                processed_email.append(word)
-    return processed_email
-
-
-def data_parser(file_path: str):
-    data_result = []
-    with open(file_path, 'r') as email_text:
-        for line in email_text.readlines():
-            for word in line.split():
-                if re.match(DATA_REGEX, word):
-                    data_result.append(word)
-    return data_result
-
-
-def time_parser(file_path: str):
-    time_result = []
-    with open(file_path, 'r') as email_text:
-        for line in email_text.readlines():
-            for word in line.split():
-                if re.match(TIME_REGEX, word):
-                    time_result.append(word)
-    return time_result

@@ -3,7 +3,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, regexp_tokenize
 import re
 import spacy
-from .parse import DATA_REGEX, TIME_REGEX
+from .regex_const import DATA_REGEX, TIME_REGEX
 
 nltk.download("stopwords")
 STOP_WORDS = set(stopwords.words("english"))
