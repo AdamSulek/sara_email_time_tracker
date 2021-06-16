@@ -6,6 +6,8 @@ mkdocstrings==0.15.0; python_version >= "3.6" and python_version < "4.0"
 prefect==0.14.17
 slack-sdk==3.6.0
 SQLAlchemy==1.4.18
+psycopg2==2.8.6
+metabase-api==0.2.11
 nltk==3.6.2
 spacy>=2.2.0,<3.0.0
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.0/en_core_web_sm-2.2.0.tar.gz#egg=en_core_web_sm
