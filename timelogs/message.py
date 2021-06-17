@@ -33,12 +33,14 @@ class Message:
 
     def to_records(self):
         nlp_pipe = self.nlp_pipe()
+        print("nlp_pipe: {}".format(nlp_pipe))
         num = 0
         for ind, word in enumerate(nlp_pipe):
             # cache words sequence 'NUM' 'NUM' and 'ADJ' or 'NOUN'
             # ('NUM', 'NUM', 'ADJ), ('NUM', 'NUM', NOUN') in - way to solve ('NUM', NOUN', 'NUM')
             timelog = {}
-            if ind <= len(nlp_pipe)-3:
+            if ind <= len(nlp_pipe):
+
                 if nlp_pipe[ind][1] == 'NUM' and \
                    nlp_pipe[ind+1][1] == 'NUM' and \
                    nlp_pipe[ind+2][1] == 'NOUN' or \
@@ -47,30 +49,17 @@ class Message:
                    nlp_pipe[ind+2][1] == 'ADJ':
 
                     num += 1
-                    timelog_name = f'timelog_{num}'
-                    timelog['timelog_name'] = f'timelog_{num}'
                     timelog['start_time'] = str(nlp_pipe[ind][0])
                     timelog['end_time'] = str(nlp_pipe[ind+1][0])
                     timelog['project_name'] = str(nlp_pipe[ind+2][0])
-                    timelog['employee'] = self.find_employee() or 'Someone'
                     timelog['user'] = self.user
                     timelog['ts'] = self.ts
+                    print(timelog)
                     self.timelogs.append(timelog)
+                else:
+                    print("message not match to timelog")
 
         return self.timelogs
-
-
-    def find_employee(self):
-        self.employee = None
-        nlp_pipe = self.nlp_pipe()
-        for ind, word in enumerate(nlp_pipe):
-            if word[1] == 'NOUN':
-                self.employee = word[0]
-                break
-            # after 4 token break, name should be in first 4 words
-            if ind > 3:
-                break
-        return str(self.employee)
 
 
     def nlp_pipe(self):

@@ -24,14 +24,24 @@ TEST = [{'timelog_name': 'test',
 
 @task
 def get_latest_timestamps():
+    '''
+        Output: float
+    '''
     db = Database(messages=TEST)
-    last_ts_db = db.select_last_timestamp()
+    every_ts_db = db.select_timestamps()
+    last_ts_db = db.select_last_timestamp_by_max()
+    print("get_every_timestamps - every time stamp from db: {}\nlen: {}".format(every_ts_db, len(every_ts_db)))
+    print("get_latest_timestamp - last time stamp from db: {}".format(last_ts_db))
     return float(last_ts_db)
 
 @task
 def retrive_messages(ts_from_db: float=1522909733.001234):
+    '''
+        Input: float
+        Output: List[Message]
+    '''
     with open('home/token.json') as json_file:
-    # with open('./token.json') as json_file:
+    #with open('./token.json') as json_file:
         token_dict = json.load(json_file)
     token = token_dict['SLACK_TOKEN']
     client = WebClient(token=token)
@@ -49,20 +59,38 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
     except SlackApiError as e:
         print(f"Error: {e}")
     channel_id = "C02327JDKAS"
+    print("retrive_messages - last time stamp from db: {}".format(ts_from_db))
     try:
         result = client.conversations_history(channel=channel_id)
         conversation_history = result["messages"]
+        logger.info("{} messages found in {}".format(len(conversation_history), id))
+        new_messages = []
         for message in conversation_history:
             ts_from_message = message['ts']
-            if float(ts_from_message) >= ts_from_db:
-                logger.info("{} messages found in {}".format(len(conversation_history), id))
-                return conversation_history
+            ts = float(ts_from_message)
+            if ts >= ts_from_db:
+                logger.info("newer message - {}\n content: {}".format(ts, message['text']))
+                new_messages.append(message)
+                # add newer timestamp even if not a message record
+                db = Database(timestamp=ts)
+                db.add_timestamp_to_db()
+            else:
+                logger.info("older message - {}".format(float(ts_from_message)))
+
+        print("new_messages: {}".format(new_messages))
+        return new_messages
+
     except SlackApiError as e:
         logger.error("Error creating conversation: {}".format(e))
         return None
 
 @task
 def parse_messages(messages: List[str] = None):
+    '''
+        Input: List[Message]
+        Output: List[Message]
+    '''
+    #print("parse_messages: messages: {}".format(messages))
     records = []
     for message in messages:
         text = message['text']
@@ -74,10 +102,14 @@ def parse_messages(messages: List[str] = None):
             logger = prefect.context.get("logger")
             logger.info(f"New record: {record}")
             records.append(record)
+    #print("records: {}".format(records))
     return records
 
 @task
 def insert_into_db(records: List[str] = None):
+    '''
+        Input: List[Message]
+    '''
     for record in records:
         db = Database(messages=record)
         db.insert_into()
@@ -87,6 +119,5 @@ with Flow('Slack messages') as flow:
     messages = retrive_messages(ts_latest)
     timelogs = parse_messages(messages)
     add_to_database = insert_into_db(timelogs)
-
 
 flow.run()

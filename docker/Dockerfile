@@ -6,12 +6,13 @@ COPY ./task_flow.py .
 
 # cron job
 RUN apt-get update && \
-    apt-get install -y cron
+    apt-get install -y cron vim
 COPY docker/crontab.txt .
 RUN crontab crontab.txt
 CMD ["cron", "-f"]
 
 COPY ./requirements.txt .
+COPY ./setup.py .
 
 RUN pip3 install -r requirements.txt
 RUN python -m nltk.downloader punkt

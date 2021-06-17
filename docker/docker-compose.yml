@@ -25,9 +25,9 @@ services:
     #   - metanet
     depends_on:
       - database
-    secrets:
-      - db_user
-      - db_password
+    # secrets:
+    #   - db_user
+    #   - db_password
   database:
     image: postgres:latest
     container_name: database
@@ -48,9 +48,9 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
       #- ~/docker/volumes/postgres:/var/lib/postgresql/data
-    secrets:
-      - db_user
-      - db_password
+    # secrets:
+    #   - db_user
+    #   - db_password
   database_admin:
     image: dpage/pgadmin4
     container_name: database_admin
@@ -72,11 +72,11 @@ services:
 #   metanet:
 #     driver: bridge
 
-secrets:
-  db_user:
-    file: ./db_user.txt
-  db_password:
-    file: ./db_password.txt
+# secrets:
+#   db_user:
+#     file: ./db_user.txt
+#   db_password:
+#     file: ./db_password.txt
 volumes:
   db-data:
 #   pgadmin-data:
