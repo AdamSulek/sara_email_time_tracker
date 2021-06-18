@@ -96,13 +96,16 @@ def parse_messages(messages: List[str] = None):
         text = message['text']
         user = message['user']
         timestamp = message['ts']
-        msg = Message(text=text, user=user, ts=timestamp)
-        record = msg.to_records()
-        if record:
-            logger = prefect.context.get("logger")
-            logger.info(f"New record: {record}")
-            records.append(record)
-    #print("records: {}".format(records))
+        for single_line in text.split('\n'):
+            print("single_line: {}".format(single_line))
+            #msg = Message(text=text, user=user, ts=timestamp)
+            msg = Message(text=single_line, user=user, ts=timestamp)
+            record = msg.to_records()
+            if record:
+                logger = prefect.context.get("logger")
+                logger.info(f"New record: {record}")
+                records.append(record)
+    print("records: {}".format(records))
     return records
 
 @task

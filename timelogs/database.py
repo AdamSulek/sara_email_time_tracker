@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import insert, select, create_engine, MetaData, Table, Column, Integer, String, Float
+from sqlalchemy import insert, select, create_engine, MetaData,\
+                       Table, Column, Integer, String, Float, ForeignKey
 from .message import Message
 from typing import Any, Dict, List
 from sqlalchemy import func
@@ -12,21 +13,28 @@ DBSession = scoped_session(sessionmaker())
 engine = None
 
 class TimeLogs(Base):
-
     __tablename__ = "timelogs"
     id = Column(Integer, primary_key=True)
     start_time = Column(String)
     end_time = Column(String)
     project_name = Column(String)
+    #user = Column(String,  ForeignKey('master_db.id'))
     user = Column(String)
+    #user = relationship("Master_DB")
+
+
+# class Master_DB(Base):
+#     __tablename__ = "master_db"
+#     id = Column(Integer, primary_key=True)
+#     user_id = Column(String, ForeignKey('timestamps.id'))
+#     user = relationship("TimeLogs", back_populates="master_db")
+#     user_name = Column(String)
 
 
 class TimeStamps(Base):
-
     __tablename__ = "timestamps"
     id = Column(Integer, primary_key=True)
     timestamp = Column(Float)
-
 
 class Database:
     """
@@ -109,7 +117,6 @@ class Database:
         '''
             Select calculated last timestamp
         '''
-        # session.query(self.stats.c.ID, func.max(self.stats.c.STA_DATE))
         last_timestamp = DBSession.query(func.max(TimeStamps.timestamp)).scalar()
         return last_timestamp
 
@@ -140,9 +147,6 @@ class Database:
             the same user and the same start_time in TimeLogs Table.
         '''
         filter = DBSession.query(TimeLogs).filter_by(user=user, start_time=start_time).first()
-        # print("class Database - method: check_duplicates\nuser: {}\n start_time: {}\n filter: {}".format(user,
-        #                                                                                         start_time,
-        #                                                                                         filter))
         if filter:
             print("You are stupid!!!\n this Timelog was created by You")
             return True

@@ -33,32 +33,25 @@ class Message:
 
     def to_records(self):
         nlp_pipe = self.nlp_pipe()
-        print("nlp_pipe: {}".format(nlp_pipe))
-        num = 0
+        #print("nlp_pipe: {}".format(nlp_pipe))
+        timelog = {}
+        st_time = True
+        # cache words sequence 'NUM' 'NUM' and 'ADJ' or 'NOUN'
+        # ('NUM', 'NUM', 'ADJ), ('NUM', 'NUM', NOUN') in - way to solve ('NUM', NOUN', 'NUM')
         for ind, word in enumerate(nlp_pipe):
-            # cache words sequence 'NUM' 'NUM' and 'ADJ' or 'NOUN'
-            # ('NUM', 'NUM', 'ADJ), ('NUM', 'NUM', NOUN') in - way to solve ('NUM', NOUN', 'NUM')
-            timelog = {}
-            if ind <= len(nlp_pipe):
+            if word[1] == 'NUM' and st_time:
+                timelog['start_time'] = str(nlp_pipe[ind][0])
+                st_time = False
+                del nlp_pipe[ind]
+            elif word[1] == 'NUM' and not st_time:
+                timelog['end_time'] = str(nlp_pipe[ind][0])
+            elif word[1] == 'NOUN' or word[1] == 'ADJ':
+                timelog['project_name'] = str(nlp_pipe[ind][0])
 
-                if nlp_pipe[ind][1] == 'NUM' and \
-                   nlp_pipe[ind+1][1] == 'NUM' and \
-                   nlp_pipe[ind+2][1] == 'NOUN' or \
-                   nlp_pipe[ind][1] == 'NUM' and \
-                   nlp_pipe[ind+1][1] == 'NUM' and \
-                   nlp_pipe[ind+2][1] == 'ADJ':
-
-                    num += 1
-                    timelog['start_time'] = str(nlp_pipe[ind][0])
-                    timelog['end_time'] = str(nlp_pipe[ind+1][0])
-                    timelog['project_name'] = str(nlp_pipe[ind+2][0])
-                    timelog['user'] = self.user
-                    timelog['ts'] = self.ts
-                    print(timelog)
-                    self.timelogs.append(timelog)
-                else:
-                    print("message not match to timelog")
-
+        if len(timelog) == 3:
+            timelog['user'] = self.user
+            timelog['ts'] = self.ts
+            self.timelogs.append(timelog)
         return self.timelogs
 
 
