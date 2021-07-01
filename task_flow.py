@@ -27,9 +27,13 @@ def get_latest_timestamps():
     '''
         Output: float
     '''
+    # these two lines so that the database is not empty
     db = Database(messages=TEST)
+    db.insert_into()
     every_ts_db = db.select_timestamps()
     last_ts_db = db.select_last_timestamp_by_max()
+    if last_ts_db == None:
+        last_ts_db = '1622909735.001234'
     print("get_every_timestamps - every time stamp from db: {}\nlen: {}".format(every_ts_db, len(every_ts_db)))
     print("get_latest_timestamp - last time stamp from db: {}".format(last_ts_db))
     return float(last_ts_db)
