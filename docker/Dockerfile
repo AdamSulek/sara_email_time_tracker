@@ -12,7 +12,6 @@ RUN crontab crontab.txt
 CMD ["cron", "-f"]
 
 COPY ./requirements.txt .
-COPY ./setup.py .
 
 RUN pip3 install -r requirements.txt
 RUN python -m nltk.downloader punkt
