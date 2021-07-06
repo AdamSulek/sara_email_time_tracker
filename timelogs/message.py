@@ -23,12 +23,27 @@ class Message:
         by default None
     """
     def __init__(self, text: str = None, user: str = None, ts: float = None):
+        self.text = text
         tokens_dirty = nltk.word_tokenize(text)
         self.tokens = [word for word in tokens_dirty if not word in STOP_WORDS]
         self.tokens = tokens_dirty
         self.user = user
         self.ts = ts
         self.timelogs = []
+
+    def check_add_me(self):
+        #should check also if user is not in master_db
+        name = None
+        print("----------     check_add_me      ------------")
+        ADD_ME_REGEX = '([aAdD]{3}.[mMeE]{2})\s(\w+)'
+        # for token in self.tokens:
+        print(f'token: {self.text}')
+        for match in re.finditer(ADD_ME_REGEX, self.text):
+            name = match[2]
+            print(match.groups())
+            print(name)
+            return name
+        #return False
 
 
     def to_records(self):

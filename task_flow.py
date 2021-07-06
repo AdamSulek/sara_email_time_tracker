@@ -3,40 +3,26 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import logging
 import prefect
-from timelogs.database import TimeStamps, Database
+from timelogs.database import TimeStamps, Database, Master_db
 from timelogs.message import Message
 from typing import Any, Dict, List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import json
 
-engine = create_engine('sqlite:///sqlalchemy.db', echo=True)
-Session = sessionmaker(bind=engine)
-session = Session()
-
-TEST = [{'timelog_name': 'test',
-         'start_time': '0:00',
-         'end_time': '10:00',
-         'project_name': 'test',
-         'employee': 'test',
-         'user': 'user',
-         'ts': '1622909735.001234'}]
 
 @task
 def get_latest_timestamps():
     '''
         Output: float
     '''
-    # these two lines so that the database is not empty
-    db = Database(messages=TEST)
-    db.insert_into()
+    db = Database()
     every_ts_db = db.select_timestamps()
     last_ts_db = db.select_last_timestamp_by_max()
     if last_ts_db == None:
         last_ts_db = '1622909735.001234'
-    print("get_every_timestamps - every time stamp from db: {}\nlen: {}".format(every_ts_db, len(every_ts_db)))
-    print("get_latest_timestamp - last time stamp from db: {}".format(last_ts_db))
     return float(last_ts_db)
+
 
 @task
 def retrive_messages(ts_from_db: float=1522909733.001234):
@@ -45,7 +31,7 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
         Output: List[Message]
     '''
     with open('home/token.json') as json_file:
-    #with open('./token.json') as json_file:
+    with open('./token.json') as json_file:
         token_dict = json.load(json_file)
     token = token_dict['SLACK_TOKEN']
     client = WebClient(token=token)
@@ -94,7 +80,6 @@ def parse_messages(messages: List[str] = None):
         Input: List[Message]
         Output: List[Message]
     '''
-    #print("parse_messages: messages: {}".format(messages))
     records = []
     for message in messages:
         text = message['text']
@@ -109,6 +94,14 @@ def parse_messages(messages: List[str] = None):
                 logger = prefect.context.get("logger")
                 logger.info(f"New record: {record}")
                 records.append(record)
+            #check if add me message
+            add_me = msg.check_add_me()
+            if add_me:
+                logger = prefect.context.get("logger")
+                logger.info(f"New User: {add_me}")
+                db = Database()
+                db.insert_into_master_db(id=message['user'], user_name=add_me)
+
     print("records: {}".format(records))
     return records
 
@@ -121,10 +114,12 @@ def insert_into_db(records: List[str] = None):
         db = Database(messages=record)
         db.insert_into()
 
+
 with Flow('Slack messages') as flow:
     ts_latest = get_latest_timestamps()
     messages = retrive_messages(ts_latest)
     timelogs = parse_messages(messages)
     add_to_database = insert_into_db(timelogs)
+
 
 flow.run()

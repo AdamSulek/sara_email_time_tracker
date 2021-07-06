@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, scoped_session, sessionmaker
+from sqlalchemy.orm import Session, scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import insert, select, create_engine, MetaData,\
                        Table, Column, Integer, String, Float, ForeignKey
@@ -18,17 +18,19 @@ class TimeLogs(Base):
     start_time = Column(String)
     end_time = Column(String)
     project_name = Column(String)
-    #user = Column(String,  ForeignKey('master_db.id'))
-    user = Column(String)
-    #user = relationship("Master_DB")
 
+    #user = Column(String, ForeignKey('master_db.ID'))
 
-# class Master_DB(Base):
-#     __tablename__ = "master_db"
-#     id = Column(Integer, primary_key=True)
-#     user_id = Column(String, ForeignKey('timestamps.id'))
-#     user = relationship("TimeLogs", back_populates="master_db")
-#     user_name = Column(String)
+    user = Column(String, ForeignKey('master_db.ID'))
+    #master_db = relationship("Master_db", backref="timelogs")
+
+class Master_db(Base):
+    __tablename__ = 'master_db'
+    ID = Column(String, primary_key=True)
+    #ID = Column(String, ForeignKey('timelogs.user'))
+    name = Column(String)
+
+    timelogs = relationship("TimeLogs", backref="master_db")
 
 
 class TimeStamps(Base):
@@ -49,7 +51,8 @@ class Database:
     database_name: str, optional
         by default sqlalchemy.db will be created in root directory.
     """
-    def __init__(self, messages: List[str] = None, database_name: str = 'metabase', timestamp: float = None):
+    def __init__(self, messages: List[str] = None, database_name: str = 'metabase',
+                                                            timestamp: float = None):
         logger = prefect.context.get("logger")
         self.messages = messages
         self.database_name = database_name
@@ -60,15 +63,24 @@ class Database:
                                                             self.database_name # database)
                                                             )
         engine = create_engine(POSTGRES_URL)
+        DBSession.remove()
         DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
         Base.metadata.create_all(engine)
         self.ts = timestamp
-        # adding of timestamps of every message - even for message without timelog event
-        # for message in self.messages:
-        #     ts = float(message['ts'])
-        #     logger.info("Added new timestamp: {}".format(ts))
-        #     DBSession.add(TimeStamps(timestamp=ts))
-        #     DBSession.commit()
+
+
+    def insert_into_master_db(self, id, user_name):
+        if not self.check_user_in_master_bd(id):
+            DBSession.add(Master_db(ID=id, name=user_name))
+            DBSession.commit()
+
+    def check_user_in_master_bd(self, id):
+        user = DBSession.query(Master_db).filter_by(ID=id).first()
+        if user:
+            print("You are stupid!!!\n this User was created!!!")
+            return True
+        print("You create new User")
+        return False
 
     def add_timestamp_to_db(self):
         '''
@@ -106,6 +118,7 @@ class Database:
 
         return True
 
+
     def select_timestamps(self):
         table_record = []
         sql_select_query = DBSession.query(TimeStamps).all()
@@ -127,16 +140,28 @@ class Database:
         last_timestamp = DBSession.query(TimeStamps).order_by(TimeStamps.id.desc()).first()
         return last_timestamp.timestamp
 
+    def select_master_db_user(self):
+        result = []
+        select_query = DBSession.query(Master_db).all()
+        for row in select_query:
+            print(f"{row.ID}, {row.name}")
+            result.append(row.ID, row.name)
+        return result
 
     def select_all_timelogs(self):
         table_record = []
-        sql_select_query = DBSession.query(TimeLogs).all()
-        for row in sql_select_query:
-            table_record.append((row.id,
-                                 row.start_time,
-                                 row.end_time,
-                                 row.project_name,
-                                 row.user))
+        query = select(Master_db, Timelogs).join(Master_db.timelogs).all()
+        for row in DBSession.execute(query):
+            print(f"{row.Timelogs.start_time},\
+                    {row.Timelogs.end_time},\
+                    {row.Timelogs.project_name},\
+                    {row.Timelogs.user},\
+                    {row.Master_db.name}")
+            table_record.append((row.Timelogs.start_time,
+                                 row.Timelogs.end_time,
+                                 row.Timelogs.project_name,
+                                 row.Timelogs.user,
+                                 row.Master_db.name))
 
         return table_record
 
