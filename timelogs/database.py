@@ -18,7 +18,7 @@ class TimeLogs(Base):
     start_time = Column(String)
     end_time = Column(String)
     project_name = Column(String)
-    date = Column(Date)
+    date = Column(String)
     #user = Column(String, ForeignKey('master_db.ID'))
 
     user = Column(String, ForeignKey('master_db.user_ID'))
@@ -93,6 +93,7 @@ class Database:
 
     def insert_into(self):
         for message in self.messages:
+            print("jeste w insert_into\n message: {}".format(message))
             if not self.check_duplicates(user=message['user'], start_time=message['start_time']):
                 DBSession.add(TimeLogs(
                                        start_time=message['start_time'],
