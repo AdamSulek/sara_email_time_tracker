@@ -30,10 +30,11 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
         Input: float
         Output: List[Message]
     '''
-    with open('home/token.json') as json_file:
+    # with open('home/token.json') as json_file:
     with open('./token.json') as json_file:
         token_dict = json.load(json_file)
     token = token_dict['SLACK_TOKEN']
+
     client = WebClient(token=token)
     logger = prefect.context.get("logger")
     channel_name = "learning"
@@ -80,6 +81,7 @@ def parse_messages(messages: List[str] = None):
         Input: List[Message]
         Output: List[Message]
     '''
+    id = None
     records = []
     for message in messages:
         text = message['text']
@@ -100,7 +102,8 @@ def parse_messages(messages: List[str] = None):
                 logger = prefect.context.get("logger")
                 logger.info(f"New User: {add_me}")
                 db = Database()
-                db.insert_into_master_db(id=message['user'], user_name=add_me)
+                id = message['user']
+                db.insert_into_master_db(id=id, user_name=add_me)
 
     print("records: {}".format(records))
     return records

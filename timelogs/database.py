@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import insert, select, create_engine, MetaData,\
-                       Table, Column, Integer, String, Float, ForeignKey
+                       Table, Column, Integer, String, Float, Date, ForeignKey
 from .message import Message
 from typing import Any, Dict, List
 from sqlalchemy import func
@@ -18,15 +18,15 @@ class TimeLogs(Base):
     start_time = Column(String)
     end_time = Column(String)
     project_name = Column(String)
-
+    date = Column(Date)
     #user = Column(String, ForeignKey('master_db.ID'))
 
-    user = Column(String, ForeignKey('master_db.ID'))
+    user = Column(String, ForeignKey('master_db.user_ID'))
     #master_db = relationship("Master_db", backref="timelogs")
 
 class Master_db(Base):
     __tablename__ = 'master_db'
-    ID = Column(String, primary_key=True)
+    user_ID = Column(String, primary_key=True)
     #ID = Column(String, ForeignKey('timelogs.user'))
     name = Column(String)
 
@@ -71,11 +71,11 @@ class Database:
 
     def insert_into_master_db(self, id, user_name):
         if not self.check_user_in_master_bd(id):
-            DBSession.add(Master_db(ID=id, name=user_name))
+            DBSession.add(Master_db(user_ID=id, name=user_name))
             DBSession.commit()
 
     def check_user_in_master_bd(self, id):
-        user = DBSession.query(Master_db).filter_by(ID=id).first()
+        user = DBSession.query(Master_db).filter_by(user_ID=id).first()
         if user:
             print("You are stupid!!!\n this User was created!!!")
             return True
@@ -98,7 +98,8 @@ class Database:
                                        start_time=message['start_time'],
                                        end_time=message['end_time'],
                                        project_name=message['project_name'],
-                                       user=message['user']
+                                       user=message['user'],
+                                       date=message['date']
                                        ))
                 DBSession.commit()
 
