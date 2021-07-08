@@ -51,6 +51,7 @@ class Message:
         timelog = {}
         timelog['project_name'] = 'meeting'
         timelog['h'] = None
+        timelog['date'] = None
         time1, time2 = None, None
         for ind, word in enumerate(nlp_pipe):
             if word[1] == 'NUM':
@@ -62,13 +63,13 @@ class Message:
                 if re.match(TIME_REGEX, date_or_time):
                     if not time1:
                         time1 = str(word[0])
-                        time1 = datetime.strptime(time1, '%H:%M')
+                        time1_timetype = datetime.strptime(time1, '%H:%M')
                         #print("type(time1): {}".format(type(time1)))
                         print(f"time1: {time1}")
                     else:
                         time2 = str(word[0])
-                        time2 = datetime.strptime(time2, '%H:%M')
-                        print("type(time12): {}".format(type(time2)))
+                        time2_timetype = datetime.strptime(time2, '%H:%M')
+                        print("type(time12): {}".format(type(time2_timetype)))
                         print(f"time2: {time2}")
             if word[1] == 'NOUN':
                 word = str(word[0])
@@ -80,7 +81,7 @@ class Message:
                 elif word.lower() == 'yesterday':
                     y = datetime.today() - timedelta(days=1)
                     #yesterday = y.strftime("%d.%m.%Y")
-                    print("type(yesterday): {}".format(type(yesterday)))
+                    #print("type(yesterday): {}".format(type(yesterday)))
                     timelog['date'] = y
                 else:
                     timelog['project_name'] = word
@@ -95,7 +96,7 @@ class Message:
             timelog['start_time'] = time1
             timelog['end_time'] = time2
 
-            working_hours = ((time1 - time2).total_seconds())/3600
+            working_hours = ((time1_timetype - time2_timetype).total_seconds())/3600
             if working_hours < 0:
                 working_hours = -working_hours
             timelog['h'] = working_hours

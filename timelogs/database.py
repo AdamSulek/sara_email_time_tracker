@@ -93,8 +93,9 @@ class Database:
 
     def insert_into(self):
         for message in self.messages:
-            print("jeste w insert_into\n message: {}".format(message))
-            if not self.check_duplicates(user=message['user'], start_time=message['start_time']):
+            #print("jeste w insert_into\n message: {}".format(message))
+            if not self.check_duplicates(user=message['user'], start_time=message['start_time'],
+                                                               date_time=message['date']):
                 DBSession.add(TimeLogs(
                                        start_time=message['start_time'],
                                        end_time=message['end_time'],
@@ -169,12 +170,12 @@ class Database:
         return table_record
 
 
-    def check_duplicates(self, user, start_time):
+    def check_duplicates(self, user, start_time, date_time):
         '''
-            This function filter duplicates of timelog define as
-            the same user and the same start_time in TimeLogs Table.
+            This function filter duplicates of timelog define
+            User can not create timelog at the same start_time and date
         '''
-        filter = DBSession.query(TimeLogs).filter_by(user=user, start_time=start_time).first()
+        filter = DBSession.query(TimeLogs).filter_by(user=user, start_time=start_time, date=date_time).first()
         if filter:
             print("You are stupid!!!\n this Timelog was created by You")
             return True
