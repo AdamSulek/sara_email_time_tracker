@@ -49,31 +49,39 @@ class Message:
         nlp_pipe = self.nlp_pipe()
         print("-------------------   nlp_pipe: {}         --------------".format(nlp_pipe))
         timelog = {}
-        timelog['project_name'] = None
+        timelog['project_name'] = 'meeting'
+        timelog['h'] = None
         time1, time2 = None, None
         for ind, word in enumerate(nlp_pipe):
             if word[1] == 'NUM':
                 date_or_time = str(word[0])
-                #print(f"there is a num: {date_or_time}")
+                print(f"there is a num: {date_or_time}")
                 if re.match(DATA_REGEX, date_or_time):
-                    #print("jest data: {}".format(date_or_time))
+                    print("jest data: {}".format(date_or_time))
                     timelog['date'] = date_or_time
                 if re.match(TIME_REGEX, date_or_time):
                     if not time1:
                         time1 = str(word[0])
+                        time1 = datetime.strptime(time1, '%H:%M')
+                        #print("type(time1): {}".format(type(time1)))
                         print(f"time1: {time1}")
                     else:
                         time2 = str(word[0])
+                        time2 = datetime.strptime(time2, '%H:%M')
+                        print("type(time12): {}".format(type(time2)))
                         print(f"time2: {time2}")
             if word[1] == 'NOUN':
                 word = str(word[0])
                 if word.lower() == 'today':
-                    today = datetime.now().strftime("%d.%m.%Y")
+                    #today = datetime.today().strftime("%d.%m.%Y")
+                    today = datetime.today()
+                    print("type(today): {}".format(type(today)))
                     timelog['date'] = today
                 elif word.lower() == 'yesterday':
                     y = datetime.today() - timedelta(days=1)
-                    yesterday = y.strftime("%d.%m.%Y")
-                    timelog['date'] = yesterday
+                    #yesterday = y.strftime("%d.%m.%Y")
+                    print("type(yesterday): {}".format(type(yesterday)))
+                    timelog['date'] = y
                 else:
                     timelog['project_name'] = word
 
@@ -83,26 +91,24 @@ class Message:
         if time2 == None:
             timelog['start_time'] = time1
             timelog['end_time'] = None
+        if time1 and time2:
+            timelog['start_time'] = time1
+            timelog['end_time'] = time2
 
-        timelog['start_time'] = time1
-        timelog['end_time'] = time2
-        #checking if some use first end_time or accidentaly
-        # if time1 > time2:
-        #     print("time1 wieksza")
-        #     timelog['start_time'] = time2
-        #     timelog['end_time'] = time1
-        # if time1 < time2:
-        #     print("time2 wieksza")
-        #     timelog['start_time'] = time1
-        #     timelog['end_time'] = time2
+            working_hours = ((time1 - time2).total_seconds())/3600
+            if working_hours < 0:
+                working_hours = -working_hours
+            timelog['h'] = working_hours
 
-        if len(timelog) >= 3:
+        # if date and start time this timelogs is useful
+        if timelog['date'] and timelog['start_time']:
             timelog['user'] = self.user
             timelog['ts'] = self.ts
             self.timelogs.append(timelog)
+            print(f'timelog: {timelog}')
+            return self.timelogs
 
-        print(f'timelog: {timelog}')
-        return self.timelogs
+        return None
 
 
     def nlp_pipe(self):

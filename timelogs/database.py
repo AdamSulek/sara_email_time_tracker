@@ -18,8 +18,8 @@ class TimeLogs(Base):
     start_time = Column(String)
     end_time = Column(String)
     project_name = Column(String)
-    date = Column(String)
-    #user = Column(String, ForeignKey('master_db.ID'))
+    date = Column(Date)
+    h = Column(Float)
 
     user = Column(String, ForeignKey('master_db.user_ID'))
     #master_db = relationship("Master_db", backref="timelogs")
@@ -100,7 +100,8 @@ class Database:
                                        end_time=message['end_time'],
                                        project_name=message['project_name'],
                                        user=message['user'],
-                                       date=message['date']
+                                       date=message['date'],
+                                       h=message['h']
                                        ))
                 DBSession.commit()
 
