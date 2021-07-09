@@ -74,6 +74,12 @@ class Database:
             DBSession.add(Master_db(user_ID=id, name=user_name))
             DBSession.commit()
 
+    def delete_timelog(self, user, delete_date):
+        print("uruchamiam delete_timelog")
+        DBSession.query(TimeLogs).filter_by(user=user, date=delete_date).delete()
+        DBSession.commit()
+
+
     def check_user_in_master_bd(self, id):
         user = DBSession.query(Master_db).filter_by(user_ID=id).first()
         if user:
@@ -93,7 +99,7 @@ class Database:
 
     def insert_into(self):
         for message in self.messages:
-            #print("jeste w insert_into\n message: {}".format(message))
+            print("jeste w insert_into\n message: {}".format(message))
             if not self.check_duplicates(user=message['user'], start_time=message['start_time'],
                                                                date_time=message['date']):
                 DBSession.add(TimeLogs(

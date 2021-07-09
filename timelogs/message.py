@@ -32,12 +32,29 @@ class Message:
         self.ts = ts
         self.timelogs = []
 
+
+    def check_delete(self):
+        '''
+            Check if delete keyword is in message
+            return data of timelogs which will be deleted
+        '''
+        #print("----------     check delete     ------------")
+        if 'delete' in self.text.lower():
+            if 'today' in self.text.lower():
+                today_str = datetime.today().strftime("%d.%m.%Y")
+                return datetime.strptime(today_str, "%d.%m.%Y")
+            data = re.findall('\d+.\d{2}.\d{4}', self.text)
+            if data:
+                return datetime.strptime(data[0], '%d.%m.%Y')
+        return None
+
+
     def check_add_me(self):
         #should check also if user is not in master_db
         name = None
-        print("----------     check_add_me      ------------")
+        #print("----------     check_add_me      ------------")
         ADD_ME_REGEX = '([aAdD]{3}.[mMeE]{2})\s(\w+)'
-        print(f'token: {self.text}')
+        #print(f'token: {self.text}')
         for match in re.finditer(ADD_ME_REGEX, self.text):
             name = match[2]
             print(match.groups())
@@ -74,17 +91,17 @@ class Message:
             if word[1] == 'NOUN':
                 word = str(word[0])
                 if word.lower() == 'today':
-                    #today = datetime.today().strftime("%d.%m.%Y")
-                    today = datetime.today()
-                    print("type(today): {}".format(type(today)))
-                    timelog['date'] = today
+                    today_str = datetime.today().strftime("%d.%m.%Y")
+                    timelog['date'] = datetime.strptime(today_str, "%d.%m.%Y")
                 elif word.lower() == 'yesterday':
-                    y = datetime.today() - timedelta(days=1)
-                    #yesterday = y.strftime("%d.%m.%Y")
-                    #print("type(yesterday): {}".format(type(yesterday)))
-                    timelog['date'] = y
+                    yesterday = datetime.today() - timedelta(days=1)
+                    yesterday_str = yesterday.strftime("%d.%m.%Y")
+                    timelog['date'] = datetime.strptime(yesterday_str, "%d.%m.%Y")
                 else:
                     timelog['project_name'] = word
+
+            if word[1] == 'ADJ' or word[1] == 'VERB':
+                timelog['project_name'] = str(word[0])
 
         if time1 == None:
             timelog['start_time'] = time2
