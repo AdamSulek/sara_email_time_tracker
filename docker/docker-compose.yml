@@ -59,6 +59,23 @@ services:
       PGADMIN_LISTEN_PORT: 80
     ports:
       - 5050:80
+  dbt:
+    build:
+      context: ./dbt
+      dockerfile: Dockerfile
+    container_name: dbt
+    volumes:
+      - ./data:/data
+      - ./dbt:/dbt_init
+    command: /bin/bash -c "chmod +x /dbt_init/dbt_entrypoint.sh && /dbt_init/dbt_entrypoint.sh"
+    ports:
+      - 8080:8080
+    #networks:
+      #- backend
+    links:
+      - database
+    depends_on:
+      - database
 
 volumes:
   db-data:
