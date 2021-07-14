@@ -32,10 +32,12 @@ clean-targets:         # directories to be removed by `dbt clean`
 config-version: 2
 models:
   # above name
-  metabase:
+  metabase123:
   #timelogs:
       #+materialized: table
       #+materialized: view
       #+schema: timelogs
       example:
           +materialized: table
+      # timestams_data:
+      #     +materialized: table

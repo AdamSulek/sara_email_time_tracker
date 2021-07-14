@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: metabase
+    database: metabase
+    schema: public
+    tables:
+      - name: timestamps
+        description: "This table contains timestamps from receiving messages"
