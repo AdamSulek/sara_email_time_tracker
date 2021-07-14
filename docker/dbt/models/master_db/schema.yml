@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: metabase
+    database: metabase
+    schema: public
+    tables:
+      - name: master_db
+        description: "This table contains users IDs and names"
