@@ -51,15 +51,20 @@ class Message:
 
     def check_add_me(self):
         #should check also if user is not in master_db
-        name = None
+        first_name = None
+        last_name = None
+        email = None
         #print("----------     check_add_me      ------------")
-        ADD_ME_REGEX = '([aAdD]{3}.[mMeE]{2})\s(\w+)'
+        ADD_ME_REGEX = '([aAdD]{3}.[mMeE]{2})\s(\w+)\s(\w+)\s([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,})'
         #print(f'token: {self.text}')
         for match in re.finditer(ADD_ME_REGEX, self.text):
-            name = match[2]
-            print(match.groups())
-            print(name)
-            return name
+            first_name = match[2]
+            last_name = match[3]
+            email = match[4]
+            #print(match.groups())
+            #print(first_name)
+            #print(last_name)
+            return first_name, last_name, email
 
 
     def to_records(self):

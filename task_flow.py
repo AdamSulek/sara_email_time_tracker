@@ -31,10 +31,9 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
         Output: List[Message]
     '''
     # with open('home/token.json') as json_file:
-    with open('./token.json') as json_file:
-        token_dict = json.load(json_file)
-    token = token_dict['SLACK_TOKEN']
-
+    # with open('./token.json') as json_file:
+    #     token_dict = json.load(json_file)
+    # token = token_dict['SLACK_TOKEN']
     client = WebClient(token=token)
     logger = prefect.context.get("logger")
     channel_name = "learning"
@@ -65,8 +64,8 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
                 # add newer timestamp even if not a message record
                 db = Database(timestamp=ts)
                 db.add_timestamp_to_db()
-            else:
-                logger.info("older message - {}".format(float(ts_from_message)))
+            #else:
+                #logger.info("older message - {}".format(float(ts_from_message)))
 
         print("new_messages: {}".format(new_messages))
         return new_messages
@@ -97,13 +96,22 @@ def parse_messages(messages: List[str] = None):
                 logger.info(f"New record: {record}")
                 records.append(record)
             #check if add me message
-            add_me = msg.check_add_me()
-            if add_me:
+            #add_me = msg.check_add_me()
+            first_name, last_name, email = msg.check_add_me()
+            if first_name and last_name and email:
                 logger = prefect.context.get("logger")
-                logger.info(f"New User: {add_me}")
+                logger.info(f"New User: {first_name} {last_name}")
                 db = Database()
                 id = message['user']
-                db.insert_into_master_db(id=id, user_name=add_me)
+                db.insert_into_master_db(id=id, first_name=first_name,
+                                         last_name=last_name, email=email)
+            #check if delete message
+            delete_date = msg.check_delete()
+            if delete_date:
+                logger = prefect.context.get("logger")
+                logger.info(f"Delete timelogs from: {delete_date}")
+                db = Database()
+                db.delete_timelog(user=message['user'], delete_date=delete_date)
 
     print("records: {}".format(records))
     return records
