@@ -34,7 +34,6 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
     # with open('./token.json') as json_file:
     #     token_dict = json.load(json_file)
     # token = token_dict['SLACK_TOKEN']
-    token = "xoxb-2055296280309-2146683809428-I1tolWrk3P3B27PCpn9vjmMs"
     client = WebClient(token=token)
     logger = prefect.context.get("logger")
     channel_name = "learning"
