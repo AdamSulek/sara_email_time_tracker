@@ -63,13 +63,14 @@ class Message:
             email = match[4]
             #print(match.groups())
             #print(first_name)
-            #print(last_name)
             return first_name, last_name, email
+
+        #return None, None, None
 
 
     def to_records(self):
         nlp_pipe = self.nlp_pipe()
-        print("-------------------   nlp_pipe: {}         --------------".format(nlp_pipe))
+        print("-------------------   nlp_pipe: {}\n nlp type: {}         --------------".format(nlp_pipe, type(nlp_pipe)))
         timelog = {}
         timelog['project_name'] = 'meeting'
         timelog['h'] = None
@@ -130,8 +131,6 @@ class Message:
             self.timelogs.append(timelog)
             print(f'timelog: {timelog}')
             return self.timelogs
-
-        return None
 
 
     def nlp_pipe(self):
