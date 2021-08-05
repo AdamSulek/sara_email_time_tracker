@@ -70,8 +70,18 @@ services:
     command: /bin/bash -c "chmod +x /dbt_init/dbt_entrypoint.sh && /dbt_init/dbt_entrypoint.sh"
     ports:
       - 8080:8080
-    #networks:
-      #- backend
+    links:
+      - database
+    depends_on:
+      - database
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    container_name: fastapi
+    #command: uvicorn fastapi.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    ports:
+      - 8000:8000
     links:
       - database
     depends_on:
