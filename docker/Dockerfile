@@ -22,4 +22,3 @@ RUN pip install -r requirements.txt
 RUN pip install python-multipart
 
 RUN python -m nltk.downloader punkt
-RUN python -m spacy download en_core_web_sm

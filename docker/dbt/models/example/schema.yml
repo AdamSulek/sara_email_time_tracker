@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: metabase
+    database: metabase
+    schema: public
+    tables:
+      - name: timelogs
+        description: "This table contains: start/end time, date and user of timelogs"
