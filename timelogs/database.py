@@ -28,7 +28,9 @@ class TimeLogs(Base):
 class Master_db(Base):
     __tablename__ = 'master_db'
     user_ID = Column(String, primary_key=True)
-    name = Column(String)
+    first_name = Column(String)
+    last_name = Column(String)
+    email = Column(String)
     timelogs = relationship("TimeLogs", backref="master_db")
 
 
@@ -99,9 +101,10 @@ class Database:
             print("class Database - method: insert_into\nAWARE - THIS IS A DUPLICATE!!!!")
 
 
-    def insert_into_master_db(self, id, user_name):
+    def insert_into_master_db(self, id, first_name, last_name, email):
         if not self.check_user_in_master_bd(id):
-            DBSession.add(Master_db(user_ID=id, name=user_name))
+            DBSession.add(Master_db(user_ID=id, first_name=first_name,
+                                    last_name=last_name, email=email))
             DBSession.commit()
 
     def delete_timelog(self, user, delete_date):
