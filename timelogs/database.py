@@ -7,6 +7,8 @@ from typing import Any, Dict, List
 from sqlalchemy import func
 import logging
 import prefect
+import datetime
+
 
 Base = declarative_base()
 DBSession = scoped_session(sessionmaker())
@@ -20,16 +22,13 @@ class TimeLogs(Base):
     project_name = Column(String)
     date = Column(Date)
     h = Column(Float)
-
     user = Column(String, ForeignKey('master_db.user_ID'))
     #master_db = relationship("Master_db", backref="timelogs")
 
 class Master_db(Base):
     __tablename__ = 'master_db'
     user_ID = Column(String, primary_key=True)
-    #ID = Column(String, ForeignKey('timelogs.user'))
     name = Column(String)
-
     timelogs = relationship("TimeLogs", backref="master_db")
 
 
@@ -51,7 +50,7 @@ class Database:
     database_name: str, optional
         by default sqlalchemy.db will be created in root directory.
     """
-    def __init__(self, messages: List[str] = None, database_name: str = 'metabase',
+    def __init__(self, messages: Dict[str, Any] = None, database_name: str = 'metabase',
                                                             timestamp: float = None):
         logger = prefect.context.get("logger")
         self.messages = messages
@@ -67,6 +66,37 @@ class Database:
         DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
         Base.metadata.create_all(engine)
         self.ts = timestamp
+
+    def insert_from_api(self):
+        
+        for key, message in self.messages.items():
+            if key == "start_time":
+                start_time = message
+            if key == "end_time":
+                end_time = message
+            if key == "project_name":
+                project_name = message
+            if key == "user":
+                user = message
+            if key == "date":
+                date = message
+            if key == "h":
+                h = message
+
+        if not self.check_duplicates(user=user, start_time=start_time,
+                                     date_time=date):
+            DBSession.add(TimeLogs(
+                                   start_time=start_time,
+                                   end_time=end_time,
+                                   project_name=project_name,
+                                   user=user,
+                                   date=date,
+                                   h=h
+                                   ))
+            DBSession.commit()
+            print("class Database - method: insert_into\nTHIS IS NOT A DUPLICATE!!!!")
+        else:
+            print("class Database - method: insert_into\nAWARE - THIS IS A DUPLICATE!!!!")
 
 
     def insert_into_master_db(self, id, user_name):
@@ -97,6 +127,7 @@ class Database:
         DBSession.commit()
 
 
+    # insert into from Slack
     def insert_into(self):
         for message in self.messages:
             print("jeste w insert_into\n message: {}".format(message))

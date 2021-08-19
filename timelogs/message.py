@@ -52,9 +52,9 @@ class Message:
     def check_add_me(self):
         #should check also if user is not in master_db
         name = None
-        #print("----------     check_add_me      ------------")
+        print("----------     check_add_me      ------------")
         ADD_ME_REGEX = '([aAdD]{3}.[mMeE]{2})\s(\w+)'
-        #print(f'token: {self.text}')
+        print(f'token: {self.text}')
         for match in re.finditer(ADD_ME_REGEX, self.text):
             name = match[2]
             print(match.groups())

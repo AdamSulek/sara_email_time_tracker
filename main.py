@@ -6,83 +6,95 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from typing import Optional, List
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-
-# import sys
-#sys.path.insert(0,'..')
-# sys.path.insert(0,'../..')
-#sys.path.insert(0,'../../..')
-# sys.path.append('/timelogs')
-
-# Now you can import your module
-# from database import TimeLogs
-from timelogs.database import TimeLogs
+from datetime import date, datetime, timedelta
+from timelogs.database import TimeLogs, Database
+import time
 
 templates = Jinja2Templates(directory="htmldirectory")
 
-POSTGRES_URL = 'postgresql://{}:{}@{}:{}/{}'.format('postgres',        # user
-                                                    'postgres',        # password
-                                                    'database',        # host name
-                                                    '5432',            # port
-                                                    'metabase' # database)
-                                                    )
-engine = create_engine(POSTGRES_URL)
-Base = declarative_base()
-DBSession = scoped_session(sessionmaker())
-DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
+# POSTGRES_URL = 'postgresql://{}:{}@{}:{}/{}'.format('postgres',        # user
+#                                                     'postgres',        # password
+#                                                     'database',        # host name
+#                                                     '5432',            # port
+#                                                     'metabase' # database)
+#                                                     )
+# engine = create_engine(POSTGRES_URL)
+# Base = declarative_base()
+# DBSession = scoped_session(sessionmaker())
+# DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
+# Base.metadata.create_all(engine)
 
-Base.metadata.create_all(engine)
-
-# class TimeLogs(Base):
-#     __tablename__ = "timelogs"
-#     id = Column(Integer, primary_key=True)
-#     start_time = Column(String)
-#     end_time = Column(String)
-#     project_name = Column(String)
-#     date = Column(Date)
-#     h = Column(Float)
-#     user = Column(String)
-    # user = Column(String, ForeignKey('master_db.user_ID'))
 
 app = FastAPI()
 
 # def get_db():
-#     db = SessionLocal()
+#     DBSession = scoped_session(sessionmaker())
+#     DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
+#     Base.metadata.create_all(engine)
+#     # db = SessionLocal()
 #     try:
-#         yield db
+#         yield DBSession
 #     finally:
-#         db.close()
-database = {}
+#         DBSession.close()
+        # db.close()
 
-class TimeLogs(BaseModel):
-    id: int
-    start_time: str = "8:00"
-    end_time: str = "18:00"
-    project_name: str = "wasting time :)"
-    date: str = None
+
+class Timelogs(BaseModel):
+    start_time: str = None
+    end_time: str = None
+    project_name: str = None
+    # date: str = None
+    date: datetime = None
     h: float = None
     user: str = None
 
-# timelogs_1 = TimeLogs(id=1)
-# timelogs_2 = TimeLogs(id=2, date="21.12.2021", h="8.00", user="Adam")
-# database[1] = timelogs_1
-# database[2] = timelogs_2
+@app.post("/add-user/")
+def add_new_user(id: str = Form(...),
+                 user_name: str = Form(...)):
+    db = Database()
+    db.insert_into_master_db(id=id, user_name=user_name)
+    return {"id": id, "user_time": user_name}
 
 @app.post("/add-timelogs/")
 def add_new_timelogs(start_time: str = Form(...),
                      end_time: str = Form(...),
                      project_name: str = Form(...),
-                     date: str = Form(...),
-                     h: float = Form(...),
-                     user: str = Form(...)):
+                     #date: str = Form(...),
+                     h: float = Form(...)
+                     #user: str = Form(...)
+                     ):
 
-    TimeLogs[start_time] = start_time
-    TimeLogs[end_time] = end_time
-    TimeLogs[project_name] = project_name
-    TimeLogs[date] = date
-    TimeLogs[h] = h
-    TimeLogs[user] = user
-    #return(start_time)
-    return TimeLogs
+    today_str = datetime.today().strftime("%d.%m.%Y")
+    ts = time.time()
+    api_post_request = {}
+    api_post_request["start_time"] = start_time
+    api_post_request["end_time"] = end_time
+    api_post_request["project_name"] = project_name
+    api_post_request["date"] = datetime.strptime(today_str, "%d.%m.%Y")
+    api_post_request["h"] = h
+    api_post_request["user"] = 'U02A69XJ49K' # for now it is only my SLACK_ID, in future check list of available users
+    api_post_request["ts"] = str(ts)
+
+    # result = Timelogs(**api_post_request)
+    #dd = datetime.strptime(today_str, "%d.%m.%Y")
+
+    print("========================= {} =======================".format(api_post_request))
+    message = {
+        "start_time": start_time,
+        "end_time": end_time,
+        "project_name": project_name,
+        "h": h,
+        "user": 'U02A69XJ49K',
+        "date": datetime.strptime(today_str, "%d.%m.%Y"),
+        "ts": str(ts)
+    }
+
+    db = Database(messages=api_post_request)
+    db.insert_from_api()
+    # db.insert_into()
+
+    return api_post_request
+
 
 @app.get("/timelogs/{timelog_id}")
 def get_timelogs(timelog_id: int):
@@ -92,14 +104,9 @@ def get_timelogs(timelog_id: int):
     return {"Data": "not found"}
 
 
-
-
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse( "home.html", {"request": request} )
-    # return {"title": "Hello from anothe world and some changes and more or less\n bitch!"}
-
-
 
 
 #updating

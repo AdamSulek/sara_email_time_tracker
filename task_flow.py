@@ -126,3 +126,9 @@ with Flow('Slack messages') as flow:
 
 
 flow.run()
+
+
+# if __name__ == '__main__':
+#     import uvicorn
+#
+#     uvicorn.run('docker.fastapi:app', host='0.0.0.0', port=8000, reload=True)
