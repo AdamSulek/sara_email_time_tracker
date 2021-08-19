@@ -12,31 +12,7 @@ import time
 
 templates = Jinja2Templates(directory="htmldirectory")
 
-# POSTGRES_URL = 'postgresql://{}:{}@{}:{}/{}'.format('postgres',        # user
-#                                                     'postgres',        # password
-#                                                     'database',        # host name
-#                                                     '5432',            # port
-#                                                     'metabase' # database)
-#                                                     )
-# engine = create_engine(POSTGRES_URL)
-# Base = declarative_base()
-# DBSession = scoped_session(sessionmaker())
-# DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
-# Base.metadata.create_all(engine)
-
-
 app = FastAPI()
-
-# def get_db():
-#     DBSession = scoped_session(sessionmaker())
-#     DBSession.configure(bind=engine, autoflush=False, expire_on_commit=False)
-#     Base.metadata.create_all(engine)
-#     # db = SessionLocal()
-#     try:
-#         yield DBSession
-#     finally:
-#         DBSession.close()
-        # db.close()
 
 
 class Timelogs(BaseModel):
@@ -58,6 +34,7 @@ def add_new_user(id: str = Form(...),
     db.insert_into_master_db(id=id, first_name=first_name, 
                              last_name=last_name, email=email)
     return {"first_name": first_name, "last_name": last_name}
+   
 
 @app.post("/add-timelogs/")
 def add_new_timelogs(start_time: str = Form(...),
@@ -109,7 +86,3 @@ def index(request: Request):
     return templates.TemplateResponse( "home.html", {"request": request} )
 
 
-#updating
-# @app.put("/timelogs/{timelog_id}")
-# def update_timelogs(timelog_id: int, timelog: Item):
-#     return {"item_name": item.name, "item_id": item_id}

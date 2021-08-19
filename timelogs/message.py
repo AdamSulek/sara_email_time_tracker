@@ -51,6 +51,9 @@ class Message:
 
     def check_add_me(self):
         #should check also if user is not in master_db
+        print("----------     check_add_me      ------------")
+        ADD_ME_REGEX = '([aAdD]{3}.[mMeE]{2})\s(\w+)'
+        print(f'token: {self.text}')
         first_name = None
         last_name = None
         email = None
