@@ -1,0 +1,12 @@
+timelogs:
+  outputs:
+    dev:
+      type: postgres
+      threads: 4
+      host: database
+      port: 5432
+      user: postgres
+      pass: postgres
+      dbname: metabase
+      schema: public
+  target: dev
