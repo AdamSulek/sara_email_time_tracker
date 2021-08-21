@@ -13,6 +13,5 @@ RUN pip install -r requirements.txt
 RUN pip install Jinja2
 RUN pip install python-multipart
 
-#RUN [ "python", "-c", "import nltk; nltk.download('all')" ]
-#RUN pip install -U nltk
-#RUN python -m nltk.downloader punkt
+RUN apt-get update && \
+    apt-get install -y vim
