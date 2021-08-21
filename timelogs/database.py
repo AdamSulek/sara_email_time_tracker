@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session, scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import insert, select, create_engine, MetaData,\
                        Table, Column, Integer, String, Float, Date, ForeignKey
-# from .message import Message
 from typing import Any, Dict, List
 from sqlalchemy import func
 import logging
