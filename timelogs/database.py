@@ -109,8 +109,8 @@ class Database:
         return False
 
     def delete_user(self, user_id):
-        if check_if_user_exist():
-            DBSession.delete( Master_db(user_ID=user_id ))
+        if check_if_user_exist(user=user_id):
+            DBSession.delete(Master_db(user_ID=user_id))
             DBSession.commit()
             return True
         return False

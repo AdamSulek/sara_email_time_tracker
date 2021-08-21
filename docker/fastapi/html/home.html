@@ -20,7 +20,15 @@
     <input type="text" id="user_field" name="user"><br>
     <input type="submit">
 </form>
-
+<br><br>
+<h1>Delete a user by user_ID: </h1>
+<form action="/delete-timelogs" method="post" enctype="multipart/form-data">
+    <label for="st_field">Used ID: </label>
+    <input type="text" id="st_field" name="user"><br>
+    <label for="end_field">date: </label>
+    <input type="text" id="end_field" name="delete_date"><br>
+    <input type="submit">
+</form>
 
 <br>
 <h1>Create a new user: </h1>
@@ -45,6 +53,8 @@
     <input type="submit">
 </form>
 <body>
+
+<br><br><br><br>
 
  <a href="http://0.0.0.0/meta">
    metabase

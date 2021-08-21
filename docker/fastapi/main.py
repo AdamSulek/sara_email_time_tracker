@@ -36,14 +36,56 @@ def add_new_user(request: Request,
                  email: str = Form(...)
                  ):
     db = Database()
-    db.insert_into_master_db(id=id, first_name=first_name,
-                                    last_name=last_name, email=email)
-    # if user:
-
+    new_user = db.insert_into_master_db(id=id, first_name=first_name,
+                                          last_name=last_name, email=email)
+    if not new_user:
+        first_name = None
+        last_name = None
+    else:
+        first_name = first_name
+        lat_name = last_name
 
     return templates.TemplateResponse( "add-user.html", context={'request': request,
                                                                  'first_name': first_name,
                                                                  'last_name': last_name } )
+
+
+@app.post("/delete-user/", response_class=HTMLResponse)
+def delete_user(request: Request,
+                 id: str = Form(...)
+                 ):
+
+    db = Database()
+    old_user = db.delete_user( user_id=id )
+    if not old_user:
+        id = None
+    else:
+        id = id
+
+    return templates.TemplateResponse( "add-user.html", context={'request': request,
+                                                                 'id': id } )
+
+
+@app.post("/delete-timelogs/", response_class=HTMLResponse)
+def delete_timelogs(request: Request,
+                 user: str = Form(...),
+                 delete_date: str = Form(...)
+                 ):
+
+    db = Database()
+    old_timelogs = db.delete_timelog(user, delete_date)
+
+    if not old_timelogs:
+        user = None
+        delete_date = None
+    else:
+        user = user
+        delete_date = delete_date
+
+    return templates.TemplateResponse( "delete-timelogs.html",
+                                        context={'request': request,
+                                                 'user': user,
+                                                 'delete_date': delete_date } )
 
 
 @app.post("/add-timelogs/", response_class=HTMLResponse)
@@ -51,7 +93,6 @@ def add_new_timelogs(request: Request,
                      start_time: str = Form(...),
                      end_time: str = Form(...),
                      project_name: str = Form(...),
-                     #date: str = Form(...),
                      h: float = Form(...),
                      user: str = Form(...)
                      ):
