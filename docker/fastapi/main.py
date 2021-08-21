@@ -56,14 +56,15 @@ def delete_user(request: Request,
                  ):
 
     db = Database()
-    old_user = db.delete_user( user_id=id )
-    if not old_user:
-        id = None
-    else:
+    old_user = db.delete_user( id=id )
+    if old_user:
         id = id
+    else:
+        id = None
 
-    return templates.TemplateResponse( "add-user.html", context={'request': request,
-                                                                 'id': id } )
+    return templates.TemplateResponse( "delete-user.html",
+                                       context={'request': request,
+                                                'id': id } )
 
 
 @app.post("/delete-timelogs/", response_class=HTMLResponse)
@@ -90,6 +91,7 @@ def delete_timelogs(request: Request,
 
 @app.post("/add-timelogs/", response_class=HTMLResponse)
 def add_new_timelogs(request: Request,
+                     date: str = Form(...),
                      start_time: str = Form(...),
                      end_time: str = Form(...),
                      project_name: str = Form(...),
@@ -109,7 +111,11 @@ def add_new_timelogs(request: Request,
     api_post_request["ts"] = str(ts)
 
     db = Database(messages=api_post_request)
-    db.insert_from_api()
+    new_timelog = db.insert_from_api()
+    if new_timelog:
+        h = h
+    else:
+        h = None
 
     return templates.TemplateResponse( "add-timelogs.html", context={'request': request,
                                                                      'h': h } )

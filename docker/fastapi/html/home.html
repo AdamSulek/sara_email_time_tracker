@@ -8,6 +8,8 @@
 <h1>Create your timelog: </h1>
 <br>
 <form action="/add-timelogs" method="post" enctype="multipart/form-data">
+    <label for="date_field">date: </label>
+    <input type="date" id="date_field" name="date"><br>
     <label for="st_field">start time: </label>
     <input type="text" id="st_field" name="start_time"><br>
     <label for="end_field">end time: </label>
@@ -21,12 +23,12 @@
     <input type="submit">
 </form>
 <br><br>
-<h1>Delete a user by user_ID: </h1>
+<h1>Delete a timelog: </h1>
 <form action="/delete-timelogs" method="post" enctype="multipart/form-data">
     <label for="st_field">Used ID: </label>
     <input type="text" id="st_field" name="user"><br>
     <label for="end_field">date: </label>
-    <input type="text" id="end_field" name="delete_date"><br>
+    <input type="date" id="end_field" name="delete_date"><br>
     <input type="submit">
 </form>
 

@@ -95,22 +95,20 @@ class Database:
                                    h=h
                                    ))
             DBSession.commit()
-            print("class Database - method: insert_into\nTHIS IS NOT A DUPLICATE!!!!")
-        else:
-            print("class Database - method: insert_into\nAWARE - THIS IS A DUPLICATE!!!!")
-
+            return True
+        return False
 
     def insert_into_master_db(self, id, first_name, last_name, email):
-        if not self.check_user_in_master_bd(id):
+        if not self.check_user_in_master_bd(id=id):
             DBSession.add(Master_db(user_ID=id, first_name=first_name,
                                     last_name=last_name, email=email))
             DBSession.commit()
             return True
         return False
 
-    def delete_user(self, user_id):
-        if check_if_user_exist(user=user_id):
-            DBSession.delete(Master_db(user_ID=user_id))
+    def delete_user(self, id):
+        if self.check_user_in_master_bd(id=id):
+            DBSession.query(Master_db).filter_by(user_ID=id).delete()
             DBSession.commit()
             return True
         return False
@@ -234,12 +232,6 @@ class Database:
 
     def check_timelog_in_day(self, user, date_time):
         filter = DBSession.query(TimeLogs).filter_by(user=user, date=date_time).first()
-        if filter:
-            return True
-        return False
-
-    def check_if_user_exist(self, user):
-        filter = DBSession.query(TimeLogs).filter_by(user=user).first()
         if filter:
             return True
         return False
