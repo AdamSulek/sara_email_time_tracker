@@ -6,14 +6,8 @@ services:
     volumes:
       - ../:/home
   fastapi:
-    # build:
-    #   context: ./fastapi
-    #   dockerfile: Dockerfile
     container_name: fastapi
     image: nginx/unit:1.22.0-python3.9
-    # volumes:
-    #   - ./nginx:/var/www/html:ro
-      # - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
   metabase:
@@ -59,10 +53,6 @@ services:
       PGADMIN_LISTEN_PORT: 80
     ports:
       - 5050:80
-
-  # fastapi:
-  #   image: tiangolo/uvicorn-gunicorn-fastapi:python3.7
-  #   container_name: fastapi
   dbt:
     build:
       context: ./dbt
