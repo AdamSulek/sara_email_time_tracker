@@ -64,8 +64,6 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
                 # add newer timestamp even if not a message record
                 db = Database(timestamp=ts)
                 db.add_timestamp_to_db()
-            #else:
-                #logger.info("older message - {}".format(float(ts_from_message)))
 
         print("new_messages: {}".format(new_messages))
         return new_messages
@@ -87,26 +85,20 @@ def parse_messages(messages: List[str] = None):
         user = message['user']
         timestamp = message['ts']
         for single_line in text.split('\n'):
-            print("single_line: {}".format(single_line))
-            #msg = Message(text=text, user=user, ts=timestamp)
             msg = Message(text=single_line, user=user, ts=timestamp)
             record = msg.to_records()
             if record:
                 logger = prefect.context.get("logger")
                 logger.info(f"New record: {record}")
                 records.append(record)
-            #check if add me message
-            #add_me = msg.check_add_me()
-            # first_name, last_name, email = msg.check_add_me()
-            #if first_name and last_name and email:
             if msg.check_add_me():
                 first_name, last_name, email = msg.check_add_me()
                 logger = prefect.context.get("logger")
                 logger.info(f"New User: {first_name} {last_name}")
                 db = Database()
                 id = message['user']
-                db.insert_into_master_db(id=id, first_name=first_name,
-                                         last_name=last_name, email=email)
+                insert_new_user = db.insert_into_master_db(id=id, first_name=first_name,
+                                                           last_name=last_name, email=email)
             #check if delete message
             delete_date = msg.check_delete()
             if delete_date:
@@ -136,9 +128,3 @@ with Flow('Slack messages') as flow:
 
 
 flow.run()
-
-
-# if __name__ == '__main__':
-#     import uvicorn
-#
-#     uvicorn.run('docker.fastapi:app', host='0.0.0.0', port=8000, reload=True)

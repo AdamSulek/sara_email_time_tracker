@@ -5,10 +5,15 @@
     <title>Timelogs @AS</title>
 </head>
 <body>
-<h1>You have created new timelogs</h1>
-<br>
-<h1>You spend {{ h }} in work </h1>
-<br>
+
+  
+  {% if h %}
+      <h1> You spend Today {{ h }} hours in work </h1>
+  {% else %}
+      <h1> Today you have been created timelogs! </h1>
+  {% endif %}
+
+
 <body>
 
  <a href="http://0.0.0.0/meta">

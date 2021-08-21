@@ -5,10 +5,12 @@
     <title>Timelogs @AS</title>
 </head>
 <body>
-<h1>You have created new user {{ first_name }} {{ last_name }} </h1>
-<br>
 
-
+{% if first_name %}
+    <h1>Your account has been created: {{ first_name }} {{ last_name }} </h1>
+{% else %}
+    <h1> Your account is exsisted! </h1>
+{% endif %}
 <body>
 
  <a href="http://0.0.0.0/meta">

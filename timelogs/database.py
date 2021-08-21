@@ -22,7 +22,7 @@ class TimeLogs(Base):
     date = Column(Date)
     h = Column(Float)
     user = Column(String, ForeignKey('master_db.user_ID'))
-    #master_db = relationship("Master_db", backref="timelogs")
+
 
 class Master_db(Base):
     __tablename__ = 'master_db'
@@ -105,11 +105,22 @@ class Database:
             DBSession.add(Master_db(user_ID=id, first_name=first_name,
                                     last_name=last_name, email=email))
             DBSession.commit()
+            return True
+        return False
+
+    def delete_user(self, user_id):
+        if check_if_user_exist():
+            DBSession.delete( Master_db(user_ID=user_id ))
+            DBSession.commit()
+            return True
+        return False
 
     def delete_timelog(self, user, delete_date):
-        print("uruchamiam delete_timelog")
-        DBSession.query(TimeLogs).filter_by(user=user, date=delete_date).delete()
-        DBSession.commit()
+        if self.check_timelog_in_day(user, delete_date):
+            DBSession.query(TimeLogs).filter_by(user=user, date=delete_date).delete()
+            DBSession.commit()
+            return True
+        return False
 
 
     def check_user_in_master_bd(self, id):
@@ -219,4 +230,16 @@ class Database:
             print("You are stupid!!!\n this Timelog was created by You")
             return True
         print("You create new Timelog")
+        return False
+
+    def check_timelog_in_day(self, user, date_time):
+        filter = DBSession.query(TimeLogs).filter_by(user=user, date=date_time).first()
+        if filter:
+            return True
+        return False
+
+    def check_if_user_exist(self, user):
+        filter = DBSession.query(TimeLogs).filter_by(user=user).first()
+        if filter:
+            return True
         return False
