@@ -8,7 +8,7 @@ COPY ./task_flow.py .
 
 #WORKDIR /timelogs
 
-RUN pip install -e .
+#RUN pip install -e .
 # cron job
 RUN apt-get update && \
     apt-get install -y cron vim
