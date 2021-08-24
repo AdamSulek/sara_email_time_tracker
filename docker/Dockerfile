@@ -1,6 +1,6 @@
 FROM python:3.9-buster
 
-COPY ./timelogs .
+COPY ./timelogs /timelogs/
 COPY ./docker /docker/
 COPY ./task_flow.py .
 #COPY ./setup.py /timelogs/
