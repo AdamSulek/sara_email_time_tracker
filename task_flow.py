@@ -3,8 +3,9 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import logging
 import prefect
-from timelogs.database import TimeStamps, Database, Master_db
+from timelogs.source import TimeStamps, Source, Master_db
 from timelogs.message import Message
+from timelogs.slack import Slack
 from typing import Any, Dict, List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -16,7 +17,7 @@ def get_latest_timestamps():
     '''
         Output: float
     '''
-    db = Database()
+    db = Slack()
     every_ts_db = db.select_timestamps()
     last_ts_db = db.select_last_timestamp_by_max()
     if last_ts_db == None:
@@ -62,7 +63,7 @@ def retrive_messages(ts_from_db: float=1522909733.001234):
                 logger.info("newer message - {}\n content: {}".format(ts, message['text']))
                 new_messages.append(message)
                 # add newer timestamp even if not a message record
-                db = Database(timestamp=ts)
+                db = Slack(timestamp=ts)
                 db.add_timestamp_to_db()
             #else:
                 #logger.info("older message - {}".format(float(ts_from_message)))
@@ -97,13 +98,13 @@ def parse_messages(messages: List[str] = None):
                 records.append(record)
             #check if add me message
             #add_me = msg.check_add_me()
-            # first_name, last_name, email = msg.check_add_me()
-            #if first_name and last_name and email:
-            if msg.check_add_me():
+            first_name, last_name, email = msg.check_add_me()
+            if first_name and last_name and email:
+            # if msg.check_add_me():
                 first_name, last_name, email = msg.check_add_me()
                 logger = prefect.context.get("logger")
                 logger.info(f"New User: {first_name} {last_name}")
-                db = Database()
+                db = Slack()
                 id = message['user']
                 db.insert_into_master_db(id=id, first_name=first_name,
                                          last_name=last_name, email=email)
@@ -112,7 +113,7 @@ def parse_messages(messages: List[str] = None):
             if delete_date:
                 logger = prefect.context.get("logger")
                 logger.info(f"Delete timelogs from: {delete_date}")
-                db = Database()
+                db = Slack()
                 db.delete_timelog(user=message['user'], delete_date=delete_date)
 
     print("records: {}".format(records))
@@ -124,7 +125,7 @@ def insert_into_db(records: List[str] = None):
         Input: List[Message]
     '''
     for record in records:
-        db = Database(messages=record)
+        db = Slack(messages=record)
         db.insert_into()
 
 
