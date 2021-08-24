@@ -7,7 +7,9 @@ from typing import Optional, List
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import date, datetime, timedelta
-from timelogs.database import TimeLogs, Database
+from timelogs.source import TimeLogs
+from timelogs.slack import Slack
+from timelogs.fastapi import Fastapi
 import time
 
 templates = Jinja2Templates(directory="html")
@@ -35,7 +37,7 @@ def add_new_user(request: Request,
                  last_name: str = Form(...),
                  email: str = Form(...)
                  ):
-    db = Database()
+    db = Slack()
     new_user = db.insert_into_master_db(id=id, first_name=first_name,
                                           last_name=last_name, email=email)
     if not new_user:
@@ -55,7 +57,7 @@ def delete_user(request: Request,
                  id: str = Form(...)
                  ):
 
-    db = Database()
+    db = Slack()
     old_user = db.delete_user( id=id )
     if old_user:
         id = id
@@ -73,7 +75,7 @@ def delete_timelogs(request: Request,
                  delete_date: str = Form(...)
                  ):
 
-    db = Database()
+    db = Slack()
     old_timelogs = db.delete_timelog(user, delete_date)
 
     if not old_timelogs:
@@ -110,8 +112,8 @@ def add_new_timelogs(request: Request,
     api_post_request["user"] = user # for now it is only my SLACK_ID, in future check list of available users
     api_post_request["ts"] = str(ts)
 
-    db = Database(messages=api_post_request)
-    new_timelog = db.insert_from_api()
+    db = Fastapi(text_box=api_post_request)
+    new_timelog = db.insert_into()
     if new_timelog:
         h = h
     else:
