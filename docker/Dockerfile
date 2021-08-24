@@ -12,7 +12,7 @@ RUN pip install -e .
 # cron job
 RUN apt-get update && \
     apt-get install -y cron vim
-COPY docker/crontab.txt .
+COPY docker/crontab.txt /timelogs/
 RUN crontab crontab.txt
 
 CMD ["cron", "-f"]
