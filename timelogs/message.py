@@ -63,10 +63,12 @@ class Message:
             print(first_name)
             print(last_name)
 
-        email = re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", self.text)
-        print(email[0])
-        return first_name, last_name, email[0]
 
+        email_ = re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", self.text)
+        if email_:
+            email = email_[0]
+        #print(email[0])
+        return first_name, last_name, email
 
 
     def to_records(self):

@@ -4,8 +4,8 @@ from slack_sdk.errors import SlackApiError
 import logging
 import prefect
 from timelogs.source import TimeStamps, Source, Master_db
-from timelogs.slack import Slack
 from timelogs.message import Message
+from timelogs.slack import Slack
 from typing import Any, Dict, List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -92,8 +92,10 @@ def parse_messages(messages: List[str] = None):
                 logger = prefect.context.get("logger")
                 logger.info(f"New record: {record}")
                 records.append(record)
-            if msg.check_add_me():
-                first_name, last_name, email = msg.check_add_me()
+
+            first_name, last_name, email = msg.check_add_me()
+            if first_name and last_name and email:
+                #first_name, last_name, email = msg.check_add_me()
                 logger = prefect.context.get("logger")
                 logger.info(f"New User: {first_name} {last_name}")
                 db = Slack()
