@@ -92,6 +92,7 @@ def parse_messages(messages: List[str] = None):
                 logger = prefect.context.get("logger")
                 logger.info(f"New record: {record}")
                 records.append(record)
+            
             if msg.check_add_me():
                 first_name, last_name, email = msg.check_add_me()
                 logger = prefect.context.get("logger")
