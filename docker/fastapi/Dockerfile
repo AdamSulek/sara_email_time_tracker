@@ -1,3 +1,19 @@
-FROM python:3.9-buster
+FROM nginx/unit:1.22.0-python3.9
 
-CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY ./timelogs/source.py /app/timelogs/source.py
+COPY ./timelogs/slack.py /app/timelogs/slack.py
+COPY ./timelogs/fastapi.py /app/timelogs/fastapi.py
+
+COPY ./docker/fastapi/requirements.txt /app/requirements.txt
+COPY ./docker/fastapi/main.py /app/
+COPY ./docker/fastapi/html /app/html/
+COPY ./docker/fastapi/config.json /docker-entrypoint.d/config.json
+
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+RUN pip install Jinja2
+RUN pip install python-multipart
+
+RUN apt-get update && \
+    apt-get install -y vim

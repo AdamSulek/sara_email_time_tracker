@@ -5,15 +5,9 @@ services:
     image: python/python:3.9-buster
     volumes:
       - ../:/home
-  nginx:
-    container_name: nginx
-    image: nginx:latest
-    depends_on:
-      - metabase
-      - database_admin
-    volumes:
-      - ./nginx:/var/www/html:ro
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  fastapi:
+    container_name: fastapi
+    image: nginx/unit:1.22.0-python3.9
     ports:
       - 80:80
   metabase:
@@ -70,17 +64,6 @@ services:
     command: /bin/bash -c "chmod +x /dbt_init/dbt_entrypoint.sh && /dbt_init/dbt_entrypoint.sh"
     ports:
       - 8080:8080
-    links:
-      - database
-    depends_on:
-      - database
-  fastapi:
-    build:
-      context: ./fastapi
-      dockerfile: Dockerfile
-    container_name: fastapi
-    ports:
-      - 8000:8000
     links:
       - database
     depends_on:
