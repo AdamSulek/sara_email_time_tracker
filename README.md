@@ -6,18 +6,18 @@ The application automatically recognizes the information stored in the Slack mes
 Moreover, application recognize `add me` message from the user and add the user to database.  
 **Timelogs** works also as REST API independently and provides creating and removing the user/timelogs with GUI interface.
 
-**Metabase** was used to performs a daily sampling of each field’s values and caches the distinct values in order to make checkbox and select filters work in dashboards and SQL/native questions.
+- **Metabase** was used to performs a daily sampling of each field’s values and caches the distinct values in order to make checkbox and select filters work in dashboards and SQL/native questions.
 Metabase maintains its own information about the various tables and fields in each database to aid in querying. By default, Metabase performs this lightweight sync hourly to look for changes to the database.
 
-**FastApi** is a modern web framework tool for building APIs with Python 3.6+ based on standard Python type hints.
+- **FastApi** is a modern web framework tool for building APIs with Python 3.6+ based on standard Python type hints.
  Fastapi is one of the fastest Python frameworks available thanks to Starlette and Pydantic.
 
-**PostgreSQL** provides SSL encryption native support on traffic data, between Client and Databases. You can use a robust access-control system, in tables, objects, columns and at row-level too.
+- **PostgreSQL** provides SSL encryption native support on traffic data, between Client and Databases. You can use a robust access-control system, in tables, objects, columns and at row-level too.
 
-**Nginx** is a web server – working as a reverse proxy server can act as a traffic management, sitting in front of your backend servers and distributing client requests across a group of servers in a manner that maximizes speed and capacity utilization.
+- **Nginx** is a web server – working as a reverse proxy server can act as a traffic management, sitting in front of your backend servers and distributing client requests across a group of servers in a manner that maximizes speed and capacity utilization.
 This makes that Nginx is a load balancer  with extremely low response times even under high loading.
 
-**dbt** - gives the documentation lives with your DBT project and it is automatically generated.   
+- **dbt** - gives the documentation lives with your DBT project and it is automatically generated.   
 dbt allows you to test your data (schema tests, referential integrity tests, custom tests) and ensures data quality.
 
 
