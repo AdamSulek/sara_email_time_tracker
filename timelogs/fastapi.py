@@ -7,7 +7,7 @@ from sqlalchemy import func
 import logging
 import prefect
 import datetime
-from .source import TimeLogs, Master_db, Source
+from .source import TimeLogs, MasterDb, Source
 
 
 class Fastapi(Source):

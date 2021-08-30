@@ -18,3 +18,4 @@ asgiref==3.4.1
 pathspec==0.8.1
 pydantic==1.8.2
 starlette==0.14.2
+pandas==1.2.4

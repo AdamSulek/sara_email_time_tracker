@@ -24,7 +24,7 @@ class TimeLogs(Base):
     user = Column(String, ForeignKey('master_db.user_ID'))
 
 
-class Master_db(Base):
+class MasterDb(Base):
     __tablename__ = 'master_db'
     user_ID = Column(String, primary_key=True)
     first_name = Column(String)
@@ -70,7 +70,7 @@ class Source:
         pass
 
     def insert_into_master_db(self, id, first_name, last_name, email):
-        if not self.check_user_in_master_bd(id=id):
+        if not self.check_user_in_master_db(id=id):
             self.DBSession.add(Master_db(user_ID=id, first_name=first_name,
                                     last_name=last_name, email=email))
             self.DBSession.commit()
@@ -78,7 +78,7 @@ class Source:
         return False
 
     def delete_user(self, id):
-        if self.check_user_in_master_bd(id=id):
+        if self.check_user_in_master_db(id=id):
             self.DBSession.query(Master_db).filter_by(user_ID=id).delete()
             self.DBSession.commit()
             return True
@@ -92,7 +92,7 @@ class Source:
         return False
 
 
-    def check_user_in_master_bd(self, id):
+    def check_user_in_master_db(self, id):
         user = self.DBSession.query(Master_db).filter_by(user_ID=id).first()
         if user:
             print("You are stupid!!!\n this User was created!!!")

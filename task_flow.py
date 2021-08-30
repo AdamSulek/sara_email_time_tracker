@@ -3,7 +3,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import logging
 import prefect
-from timelogs.source import TimeStamps, Source, Master_db
+from timelogs.source import TimeStamps, Source, MasterDb
 from timelogs.message import Message
 from timelogs.slack import Slack
 from typing import Any, Dict, List

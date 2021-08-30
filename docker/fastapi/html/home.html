@@ -16,10 +16,10 @@
     <input type="text" id="end_field" name="end_time"><br>
     <label for="project_fieldd">project name: </label>
     <input type="text" id="project_field" name="project_name"><br>
-    <label for="h_fieldd">working time [h]: </label>
-    <input type="text" id="h_field" name="h"><br>
     <label for="user_field">user ID: </label>
     <input type="text" id="user_field" name="user"><br>
+    <label for="h_field">h: </label>
+    <input type="text" id="h_field" name="h"><br>
     <input type="submit">
 </form>
 <br><br>
@@ -29,6 +29,16 @@
     <input type="text" id="st_field" name="user"><br>
     <label for="end_field">date: </label>
     <input type="date" id="end_field" name="delete_date"><br>
+    <input type="submit">
+</form>
+
+<br>
+<h1>Create a timelog from file: </h1>
+<form action="/add-file" method="post" enctype="multipart/form-data">
+    <label for="file_field">Load a file: </label>
+    <input type="file" id="file_field" name="upload_file"><br>
+    <label for="destination_field">destination Pathfile: </label>
+    <input type="pathlib" id="destination_field" name="destination"><br>
     <input type="submit">
 </form>
 

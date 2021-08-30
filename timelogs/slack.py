@@ -7,7 +7,7 @@ from sqlalchemy import func
 import logging
 import prefect
 import datetime
-from .source import TimeLogs, Master_db, TimeStamps, Source
+from .source import TimeLogs, MasterDb, TimeStamps, Source
 
 
 class Slack(Source):
