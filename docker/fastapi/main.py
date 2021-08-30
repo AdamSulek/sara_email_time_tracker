@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta
 from timelogs.source import TimeLogs
 from timelogs.slack import Slack
 from timelogs.fastapi import Fastapi
-import time
+from time import time
 
 templates = Jinja2Templates(directory="html")
 
@@ -93,21 +93,30 @@ def delete_timelogs(request: Request,
 
 @app.post("/add-timelogs/", response_class=HTMLResponse)
 def add_new_timelogs(request: Request,
-                     date: str = Form(...),
+                     date_: date = Form(...),
                      start_time: str = Form(...),
                      end_time: str = Form(...),
                      project_name: str = Form(...),
-                     h: float = Form(...),
+                     # h: float = Form(...),
                      user: str = Form(...)
                      ):
 
-    today_str = datetime.today().strftime("%d.%m.%Y")
-    ts = time.time()
+    ts = time()
     api_post_request = {}
     api_post_request["start_time"] = start_time
     api_post_request["end_time"] = end_time
     api_post_request["project_name"] = project_name
-    api_post_request["date"] = datetime.strptime(today_str, "%d.%m.%Y")
+    api_post_request["date"] = date_
+
+    st_time_str = datetime.strptime(start_time, '%H:%M')
+    en_time_str = datetime.strptime(end_time, '%H:%M')
+    start_time_as_time = st_time_str.time()
+    end_time_as_time = en_time_str.time()
+    s_time = datetime.combine(date.today(), start_time_as_time)
+    e_time = datetime.combine(date.today(), end_time_as_time)
+
+    h = ((e_time - s_time).total_seconds()) / 3600
+
     api_post_request["h"] = h
     api_post_request["user"] = user # for now it is only my SLACK_ID, in future check list of available users
     api_post_request["ts"] = str(ts)
