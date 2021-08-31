@@ -16,17 +16,17 @@ templates = Jinja2Templates(directory="html")
 
 app = FastAPI()
 
-class Timelogs(BaseModel):
-    start_time: str = None
-    end_time: str = None
-    project_name: str = None
-    date: datetime = None
-    h: float = None
-    user: str = None
+# class Timelogs(BaseModel):
+#     start_time: str = None
+#     end_time: str = None
+#     project_name: str = None
+#     date: datetime = None
+#     h: float = None
+#     user: str = None
 
 
 @app.get("/home/", response_class=HTMLResponse)
-def index(request: Request):
+def index(request: Request) -> HTMLResponse:
     return templates.TemplateResponse( "home.html", {"request": request} )
 
 
@@ -36,7 +36,7 @@ def add_new_user(request: Request,
                  first_name: str = Form(...),
                  last_name: str = Form(...),
                  email: str = Form(...)
-                 ):
+                 ) -> HTMLResponse:
     db = Slack()
     new_user = db.insert_into_master_db(id=id, first_name=first_name,
                                           last_name=last_name, email=email)
@@ -55,7 +55,7 @@ def add_new_user(request: Request,
 @app.post("/delete-user/", response_class=HTMLResponse)
 def delete_user(request: Request,
                  id: str = Form(...)
-                 ):
+                 ) -> HTMLResponse:
 
     db = Slack()
     old_user = db.delete_user( id=id )
@@ -73,7 +73,7 @@ def delete_user(request: Request,
 def delete_timelogs(request: Request,
                  user: str = Form(...),
                  delete_date: str = Form(...)
-                 ):
+                 ) -> HTMLResponse:
 
     db = Slack()
     old_timelogs = db.delete_timelog(user, delete_date)
@@ -99,7 +99,7 @@ def add_new_timelogs(request: Request,
                      project_name: str = Form(...),
                      # h: float = Form(...),
                      user: str = Form(...)
-                     ):
+                     ) -> HTMLResponse:
 
     ts = time()
     api_post_request = {}

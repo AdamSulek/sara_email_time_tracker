@@ -21,11 +21,11 @@ services:
       - 3000:3000
     environment:
       MB_DB_TYPE: postgres
-      MB_DB_DBNAME: metabase
-      MB_DB_PORT: 5432
-      MB_DB_USER: postgres
-      MB_DB_PASS: postgres
-      MB_DB_HOST: database
+      MB_DB_DBNAME: '${MB_DB_DBNAME}'
+      MB_DB_PORT: '${MB_DB_PORT}'
+      MB_DB_USER: '${MB_DB_USER}'
+      MB_DB_PASS: '${POSTGRES_PASSWORD}'
+      MB_DB_HOST: '${MB_DB_HOST}'
     depends_on:
       - database
   database:
@@ -34,9 +34,9 @@ services:
     restart: always
     hostname: database
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: metabase
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_DB: '${POSTGRES_DB}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
     ports:
       - 3030:5432
     expose:
@@ -48,9 +48,9 @@ services:
     container_name: database_admin
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_LISTEN_PORT: 80
+      PGADMIN_DEFAULT_EMAIL: '${PGADMIN_DEFAULT_EMAIL}'
+      PGADMIN_DEFAULT_PASSWORD: '${PGADMIN_DEFAULT_PASSWORD}'
+      PGADMIN_LISTEN_PORT: '${PGADMIN_LISTEN_PORT}'
     ports:
       - 5050:80
   dbt:
